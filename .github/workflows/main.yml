@@ -18,27 +18,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@v1
-        with:
-          haxe-version: 4.3.4
+      - name: Setup Haxe 4.3.4
+        run: |
+          choco install haxe --version=4.3.4 -y
+          refreshenv
+          haxelib setup C:/haxelib
+        shell: powershell
 
       - name: Install haxelibs
         shell: bash
         run: |
           haxelib install lime --quiet
           haxelib install openfl --quiet
-          haxelib install flixel --quiet
-          haxelib install flixel-addons --quiet
+          haxelib install flixel 6.2.0 --quiet
+          haxelib install flixel-addons 4.0.1 --quiet
           haxelib install flixel-ui --quiet
-          haxelib install flxAnimate --quiet
-          haxelib install hxvlc --quiet
-          haxelib install discord_rpc --quiet
-          haxelib install sl-windows-api --quiet
-          haxelib run lime setup -alias -y
+          haxelib install hxvlc 2.2.6 --quiet
+          haxelib install hxdiscord_rpc 1.3.0 --quiet
+          haxelib git flxanimate https://github.com/Dot-Stuff/flxanimate master --quiet
+          haxelib git flixel-animate https://github.com/MaybeMaru/flixel-animate main --quiet
+          haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc master --quiet
+          haxelib git sl-windows-api https://github.com/Slushi-Github/SL-Windows-API main --quiet
 
       - name: Build
-        run: lime build windows -release
+        shell: bash
+        run: haxelib run lime build windows -release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -66,24 +70,28 @@ jobs:
             libvlc-dev vlc-bin \
             g++ cmake
 
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@v1
-        with:
-          haxe-version: 4.3.4
+      - name: Setup Haxe 4.3.4
+        run: |
+          curl -L https://github.com/HaxeFoundation/haxe/releases/download/4.3.4/haxe-4.3.4-linux64.tar.gz -o haxe.tar.gz
+          tar -xzf haxe.tar.gz
+          HAXE_DIR=$(find $PWD -maxdepth 1 -type d -name "haxe_*" | head -1)
+          echo "$HAXE_DIR" >> $GITHUB_PATH
+          haxelib setup ~/haxelib
 
       - name: Install haxelibs
         run: |
           haxelib install lime --quiet
           haxelib install openfl --quiet
-          haxelib install flixel --quiet
-          haxelib install flixel-addons --quiet
+          haxelib install flixel 6.2.0 --quiet
+          haxelib install flixel-addons 4.0.1 --quiet
           haxelib install flixel-ui --quiet
-          haxelib install flxAnimate --quiet
-          haxelib install hxvlc --quiet
-          haxelib run lime setup -alias -y
+          haxelib install hxvlc 2.2.6 --quiet
+          haxelib install hxdiscord_rpc 1.3.0 --quiet
+          haxelib git flxanimate https://github.com/Dot-Stuff/flxanimate master --quiet
+          haxelib git flixel-animate https://github.com/MaybeMaru/flixel-animate main --quiet
 
       - name: Build
-        run: lime build linux -release
+        run: haxelib run lime build linux -release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -101,24 +109,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@v1
-        with:
-          haxe-version: 4.3.4
+      - name: Setup Haxe 4.3.4
+        run: |
+          curl -L https://github.com/HaxeFoundation/haxe/releases/download/4.3.4/haxe-4.3.4-osx-arm64.tar.gz -o haxe.tar.gz 2>/dev/null \
+            || curl -L https://github.com/HaxeFoundation/haxe/releases/download/4.3.4/haxe-4.3.4-osx.tar.gz -o haxe.tar.gz
+          tar -xzf haxe.tar.gz
+          HAXE_DIR=$(find $PWD -maxdepth 1 -type d -name "haxe_*" | head -1)
+          echo "$HAXE_DIR" >> $GITHUB_PATH
+          haxelib setup ~/haxelib
 
       - name: Install haxelibs
         run: |
           haxelib install lime --quiet
           haxelib install openfl --quiet
-          haxelib install flixel --quiet
-          haxelib install flixel-addons --quiet
+          haxelib install flixel 6.2.0 --quiet
+          haxelib install flixel-addons 4.0.1 --quiet
           haxelib install flixel-ui --quiet
-          haxelib install flxAnimate --quiet
-          haxelib install hxvlc --quiet
-          haxelib run lime setup -alias -y
+          haxelib install hxvlc 2.2.6 --quiet
+          haxelib install hxdiscord_rpc 1.3.0 --quiet
+          haxelib git flxanimate https://github.com/Dot-Stuff/flxanimate master --quiet
+          haxelib git flixel-animate https://github.com/MaybeMaru/flixel-animate main --quiet
 
       - name: Build
-        run: lime build mac -release
+        run: haxelib run lime build mac -release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -145,36 +158,45 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android NDK r21e
+      - name: Install Android NDK r21e + platform
         run: |
           echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
             "ndk;21.4.7075529" \
             "platforms;android-33" \
             "build-tools;33.0.2"
 
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@v1
-        with:
-          haxe-version: 4.3.4
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ cmake
+
+      - name: Setup Haxe 4.3.4
+        run: |
+          curl -L https://github.com/HaxeFoundation/haxe/releases/download/4.3.4/haxe-4.3.4-linux64.tar.gz -o haxe.tar.gz
+          tar -xzf haxe.tar.gz
+          HAXE_DIR=$(find $PWD -maxdepth 1 -type d -name "haxe_*" | head -1)
+          echo "$HAXE_DIR" >> $GITHUB_PATH
+          haxelib setup ~/haxelib
 
       - name: Install haxelibs
         run: |
           haxelib install lime --quiet
           haxelib install openfl --quiet
-          haxelib install flixel --quiet
-          haxelib install flixel-addons --quiet
+          haxelib install flixel 6.2.0 --quiet
+          haxelib install flixel-addons 4.0.1 --quiet
           haxelib install flixel-ui --quiet
-          haxelib install flxAnimate --quiet
-          haxelib run lime setup -alias -y
+          haxelib install hxdiscord_rpc 1.3.0 --quiet
+          haxelib git flxanimate https://github.com/Dot-Stuff/flxanimate master --quiet
+          haxelib git flixel-animate https://github.com/MaybeMaru/flixel-animate main --quiet
 
       - name: Configure Android paths for lime
         run: |
-          lime config ANDROID_SDK $ANDROID_SDK_ROOT
-          lime config ANDROID_NDK_ROOT $ANDROID_SDK_ROOT/ndk/21.4.7075529
-          lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_SDK_ROOT/ndk/21.4.7075529
+          haxelib run lime config JAVA_HOME $JAVA_HOME
 
       - name: Build
-        run: lime build android -release
+        run: haxelib run lime build android -release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
