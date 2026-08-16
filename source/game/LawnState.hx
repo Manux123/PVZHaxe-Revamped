@@ -1,34 +1,22 @@
-package;
+package game;
 
+import core.json.LevelData;
+import discord_rpc.DiscordRpc;
+import haxe.Exception;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import openfl.geom.Point;
 import flixel.util.FlxSave;
 import AngelUtils; // for json reading
-import discord_rpc.DiscordRpc;
-import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.util.FlxColor;
 import flixel.FlxState;
-import flixel.addons.display.FlxGridOverlay;
-import flixel.ui.FlxButton;
-import DebugUtils; // Funny debug
-import Plant;
-import Lawn;
-import SeedPacket;
+import game.objects.Zombie;
+import game.objects.Plant;
+import game.objects.Lawn;
+import game.controllers.HUD;
+import core.audio.DynamicGameMusic;
 
-class PlayState extends FlxState
+class LawnState extends FlxState
 {
-	// var planttype = DataShit.plantType[0];
-	var zombie:Zombie;
-	var levelType = 'grass';
-	var background:Lawn;
-	var backgroundGrass:FlxSprite; // reference for size and stuff
-	var seedPack:SeedPacket;
-	var grid:FlxSprite; // for plant placement
-	var _gamedata:FlxSave;
-	var menuButton:FlxButton;
-
-	// ==========Pause shit========== \\
-	var lostfocuspause:FlxSprite;
-
 	override public function onFocus()
 	{
 		super.onFocus();
@@ -43,43 +31,72 @@ class PlayState extends FlxState
 		trace("[SYSTEM] User Lost Focus the window");
 	}
 
-	// Character shit \\
-	function framesArray(num:Int)
-	{
-		var array:Array<Int> = new Array<Int>();
-		for (i in 0...num)
-			array.push(i);
-		return array;
-	}
+	var background:Lawn;
+
+	var _gamedata:FlxSave;
+
+	var levelType = 'grass';
+
+	public static var selectedPlant:String = '';
+
+	public var zombieList:Array<Zombie> = [];
+	public var plantList:Array<Plant> = [];
+
+	public var plantGrp:FlxTypedGroup<Plant>;
+
+	public var curRow:Int = 0;
+	public var curCol:Int = 0;
+	public var tileSpr:FlxSprite;
+	public var plantOverlay:Plant;
+
+	public var levelData:LevelData;
+
+	// cameras
+	public var camGame:flixel.FlxCamera;
+	public var camHUD:flixel.FlxCamera;
+
+	// objects
+	public var hud:HUD;
+	public var music:DynamicGameMusic;
+
+	var menuButton:flixel.ui.FlxButton;
 
 	override public function create()
 	{
 		super.create();
 
-		background = new Lawn(-220, 0, "grass", 5, 9);
-		backgroundGrass = new FlxSprite(-220, 0);
-		lostfocuspause = new FlxSprite();
+		initializeCameras();
+		levelData = new LevelData();
+		levelData.loadLevel();
+
+		// Load Plant Animations
+		for (plant in Plant.plantIDs)
+			AnimationHandler.parseAnimation('data/plants', plant);
+
+		background = new Lawn();
+		add(background);
 
 		getLevel();
-		add(background);
-		add(backgroundGrass);
 
-		grid = FlxGridOverlay.create(1, 1, background.rows, background.columns);
-		grid.antialiasing = false;
-		grid.scale.set(90, 90);
-		grid.updateHitbox();
-		grid.x += 100;
-		add(grid);
+		tileSpr = new FlxSprite().makeGraphic(Std.int(background.gridWid / background.rows), Std.int(background.gridHei / background.columns), 0x7FFFFFFF);
+		tileSpr.active = false;
+		add(tileSpr);
 
-		zombie = new Zombie(200, 100, "basic", true);
-		add(zombie);
+		plantOverlay = new Plant(0, 0);
+		plantOverlay.updateHitbox();
+		plantOverlay.alpha = 0.5;
+		plantOverlay.visible = false;
+		plantOverlay.active = false;
+		add(plantOverlay);
 
-		seedPack = new SeedPacket(0, 0, "peashooter", 100);
-		seedPack.screenCenter();
-		seedPack.x += 150;
-		add(seedPack);
+		plantGrp = new FlxTypedGroup<Plant>();
+		add(plantGrp);
 
-		menuButton = new FlxButton(681, -12, '', pauseBitch);
+		hud = new HUD();
+		hud.cameras = [camHUD];
+		add(hud);
+
+		menuButton = new flixel.ui.FlxButton(681, -12, '', pauseBitch);
 		menuButton.loadGraphic('assets/images/menu/inGamePause.png', true, 117, 48);
 		add(menuButton);
 
@@ -132,7 +149,7 @@ class PlayState extends FlxState
 					largeImageText: 'Plants VS Zombies: Haxe Edition'
 				});
 				background.reloadImage('assets/images/levels/grassday/grassday_dirt.png');
-				FlxG.sound.playMusic('assets/music/grasswalk.ogg');
+				music.audioGame(1, 'grasswalk');
 			case 'grass':
 				DiscordRpc.presence({
 					details: 'Version: [PRIVATE BETA 2]',
@@ -141,7 +158,8 @@ class PlayState extends FlxState
 					largeImageText: 'Plants VS Zombies: Haxe Edition'
 				});
 				background.reloadImage('assets/images/levels/grassday/grassday.png');
-				FlxG.sound.playMusic('assets/music/grasswalk.ogg');
+				music.audioGame(1, 'grasswalk');
+
 			case 'night':
 				DiscordRpc.presence({
 					details: 'Version: [PRIVATE BETA 2]',
@@ -150,7 +168,7 @@ class PlayState extends FlxState
 					largeImageText: 'Plants VS Zombies: Haxe Edition'
 				});
 				background.reloadImage('assets/images/levels/grassnight/grassnight.jpg');
-				FlxG.sound.playMusic('assets/music/moongrains.ogg');
+				music.audioGame(2, 'moongrains');
 			case 'pool':
 				DiscordRpc.presence({
 					details: 'Version: [PRIVATE BETA 2]',
@@ -161,11 +179,11 @@ class PlayState extends FlxState
 				background.reloadImage('assets/images/levels/poolday/poolday.jpg');
 				if (_gamedata.data.fastpool == true)
 				{
-					FlxG.sound.playMusic('assets/music/watery_graves_fast.ogg'); // faster
+					music.audioGame(3, 'watery_graves_fast');
 				}
 				else
 				{
-					FlxG.sound.playMusic('assets/music/watery_graves.ogg'); // default/slower
+					music.audioGame(3, 'watery_graves');
 				}
 			case 'night_pool':
 				DiscordRpc.presence({
@@ -175,7 +193,7 @@ class PlayState extends FlxState
 					largeImageText: 'Plants VS Zombies: Haxe Edition'
 				});
 				background.reloadImage('assets/images/levels/poolnight/poolnight.jpg');
-				FlxG.sound.playMusic('assets/music/rigor_moris.ogg'); // play fog music and stuff
+				music.audioGame(4, 'rigor_moris');
 			case 'roof':
 				DiscordRpc.presence({
 					details: 'Version: [PRIVATE BETA 2]',
@@ -186,7 +204,7 @@ class PlayState extends FlxState
 					largeImageText: 'Plants VS Zombies: Haxe Edition'
 				});
 				background.reloadImage('assets/images/levels/roofday/roofday.jpg');
-				FlxG.sound.playMusic('assets/music/graze_the_roof.ogg');
+				music.audioGame(5, 'graze_the_roof');
 			case 'roof_night':
 				DiscordRpc.presence({
 					details: 'Version: [PRIVATE BETA 2]',
@@ -197,7 +215,7 @@ class PlayState extends FlxState
 					largeImageText: 'Plants VS Zombies: Haxe Edition'
 				});
 				background.reloadImage('assets/images/levels/roofnight/roofnight.jpg');
-				FlxG.sound.playMusic('assets/music/brainiac_maniac.ogg');
+				music.audioGame(5, 'brainiac_maniac');
 		}
 	}
 
@@ -205,37 +223,61 @@ class PlayState extends FlxState
 	{
 		super.update(elapsed);
 
-		if (FlxG.keys.justPressed.PERIOD)
+		var plantSelectedIndex:Int = Std.int(Plant.plantIDs.indexOf(selectedPlant));
+		FlxG.watch.add(plantSelectedIndex, "String", "curPlantSelected");
+
+		// Funni thingie just gets what tile the mouse is currently on
+		curRow = Std.int(Math.max(0, Math.min(background.rows - 1, Math.round((FlxG.mouse.x - 30 - background.tileWid / 2) / background.tileWid))));
+		curCol = Std.int(Math.max(0, Math.min(background.columns - 1, Math.round((FlxG.mouse.y - 75 - background.tileHei / 2) / background.tileHei))));
+
+		var currentTile = background.tileData[curRow][curCol];
+		var isValid = false;
+		if (plantOverlay.plantableType == DEFAULT)
+			isValid = !currentTile.hasDEFAULT
+		else if (plantOverlay.plantableType == TILED)
+			isValid = !currentTile.hasTILED
+		else if (plantOverlay.plantableType == SECONDARY)
+			isValid = !currentTile.hasSECONDARY;
+
+		tileSpr.visible = plantOverlay.visible = FlxG.mouse.x >= 30
+			&& FlxG.mouse.x <= background.gridWid + 30
+			&& FlxG.mouse.y >= 75
+			&& FlxG.mouse.y <= background.gridHei + 75
+			&& isValid;
+
+		if (tileSpr.visible)
 		{
-			_gamedata.data.world++;
-			if (_gamedata.data.world > 6)
-			{
-				_gamedata.data.world = 1;
-			};
-			getLevel();
+			placePlant();
 		}
-		if (FlxG.keys.justPressed.COMMA)
+	}
+
+	function initializeCameras()
+	{
+		camGame = new flixel.FlxCamera();
+		FlxG.cameras.reset(camGame);
+
+		camHUD = new flixel.FlxCamera();
+		camHUD.bgColor.alpha = 0;
+		FlxG.cameras.add(camHUD, false);
+	}
+
+	private function placePlant()
+	{
+		var currentTile = background.tileData[curRow][curCol];
+		tileSpr.setPosition(curRow * background.tileWid + 30, curCol * background.tileHei + 75);
+		plantOverlay.setPosition(tileSpr.x + 7.5, tileSpr.y + 12.5);
+
+		if (FlxG.mouse.justPressed && plantOverlay.visible)
 		{
-			_gamedata.data.level++;
-			if (_gamedata.data.level > 3)
-			{
-				_gamedata.data.level = 1;
-			};
-			getLevel();
+			#if debug
+			trace('At Row ${curRow + 1}, Coloumn: ${curCol + 1}');
+			#end
+			currentTile.appendPlant(plantOverlay.plantableType, () -> plantGrp.add(new Plant(plantOverlay.x, plantOverlay.y)));
 		}
-		DebugUtils.debug(menuButton);
-		if (FlxG.keys.justReleased.G)
-		{
-			if (levelType == 'grass_dirt')
-			{
-				levelType = 'grass';
-				getLevel();
-			}
-			else
-			{
-				levelType = 'grass_dirt';
-				getLevel();
-			}
-		}
+	}
+
+	override public function destroy()
+	{
+		super.destroy();
 	}
 }

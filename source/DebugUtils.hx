@@ -1,7 +1,6 @@
 package;
 
 import flixel.FlxObject;
-import flixel.FlxG;
 
 class DebugUtils
 {

@@ -1,6 +1,6 @@
 package;
 
-import flixel.FlxG;
+import core.api.WindowAPI;
 import flixel.FlxGame;
 import openfl.display.Sprite;
 import openfl.display.FPS;
@@ -13,11 +13,13 @@ class Main extends Sprite
 	public function new()
 	{
 		super();
-		addChild(new FlxGame(800, 600, LoadingState, 60, 60, false, false));
+		addChild(new FlxGame(800, 600, MainLoadState, 60, 60, false, false));
 		FlxG.autoPause = false;
 
 		// mouse \\
-		FlxG.mouse.load('assets/images/cursor.png');
+		FlxG.mouse.load(Paths.image('cursor'));
+
+		WindowAPI.init();
 
 		#if !mobile
 		fpsCounter = new FPS(10, 3, 0xFFFFFF);

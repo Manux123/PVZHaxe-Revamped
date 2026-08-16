@@ -1,3 +1,4 @@
 export/
 .vscode/
+.haxelib/
 source/OldZombie.hx

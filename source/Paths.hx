@@ -1,7 +1,5 @@
 package;
 
-import openfl.Assets;
-import flixel.FlxG;
 #if sys
 import sys.FileSystem;
 #end
@@ -40,7 +38,7 @@ class Paths
 		return file(key, "sounds", 'ogg');
 	}
 
-	public static function music(key:String)
+	public static function music(key:String):Dynamic
 	{
 		return file(key, "music", 'ogg');
 	}

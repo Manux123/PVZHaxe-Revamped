@@ -2,7 +2,6 @@ package;
 
 import AngelUtils; // for masking lol
 import discord_rpc.DiscordRpc;
-import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxRect;
 import flixel.FlxState;
@@ -15,7 +14,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import DebugUtils;
 
-class LoadingState extends FlxState
+class MainLoadState extends FlxState
 {
 	var loadingtxt:FlxText;
 	var popcap_logo:FlxSprite;
@@ -158,9 +157,9 @@ class LoadingState extends FlxState
 			// Moving the grass thing \\
 			/* [INSERT GRASS MASKING CODE HERE] */
 			FlxTween.tween(grass_ball, {angle: 360.0}, 5, {type: FlxTweenType.LOOPING}); // speeeen
-			FlxTween.tween(grass_ball, {x: 508, y: 500}, 10, {type: FlxTweenType.ONESHOT}); // yo, he movin'
-			FlxTween.tween(grass_ball.scale, {x: 0.4, y: 0.4}, 10, {type: FlxTweenType.ONESHOT}); // oh god he is shrinking oh god
-			new FlxTimer().start(10, function(tmr:FlxTimer)
+			FlxTween.tween(grass_ball, {x: 508, y: 500}, 6, {type: FlxTweenType.ONESHOT}); // yo, he movin'
+			FlxTween.tween(grass_ball.scale, {x: 0.4, y: 0.4}, 6, {type: FlxTweenType.ONESHOT}); // oh god he is shrinking oh god
+			new FlxTimer().start(6, function(tmr:FlxTimer)
 			{
 				remove(loadingtxt);
 				remove(grass_ball);
@@ -182,7 +181,7 @@ class LoadingState extends FlxState
 
 	function continuefunc()
 	{
-		FlxG.switchState(new MainMenuState());
+		FlxG.switchState(new game.menus.MainMenuState());
 	}
 
 	override public function update(elapsed:Float)
@@ -192,13 +191,7 @@ class LoadingState extends FlxState
 		// keep it running when it's a live and kill it when it's not?????? \\
 		DiscordRpc.process();
 		if (false)
-		{
 			DiscordRpc.shutdown();
-		};
-		if (FlxG.keys.justReleased.R)
-		{
-			FlxG.switchState(new LoadingState());
-		}
 
 		if (grass_ball != null)
 		{

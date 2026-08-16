@@ -1,0 +1,56 @@
+{
+    "dependencies": [
+        {
+            "name": "flixel",
+            "type": "haxelib",
+            "version": "6.2.0"
+        },
+        {
+            "name": "flixel-addons",
+            "type": "haxelib",
+            "version": "4.0.1"
+        },
+        {
+            "name": "flxanimate",
+            "type": "git",
+            "dir": null,
+            "ref": "master",
+            "url": "https://github.com/Dot-Stuff/flxanimate"
+        },
+        {
+            "name": "flixel-animate",
+            "type": "git",
+            "dir": null,
+            "ref": "main",
+            "url": "https://github.com/MaybeMaru/flixel-animate"
+        },
+        {
+            "name": "flixel-ui",
+            "type": "haxelib"
+        },
+        {
+            "name": "hxvlc",
+            "type": "haxelib",
+            "version": "2.2.6"
+        },
+        {
+            "name": "discord_rpc",
+            "type": "git",
+            "dir": null,
+            "ref": "master",
+            "url": "https://github.com/Aidan63/linc_discord-rpc"
+        },
+        {
+            "name": "hxdiscord_rpc",
+            "type": "haxelib",
+            "version": "1.3.0"
+        },
+        {
+            "name": "sl-windows-api",
+            "type": "git",
+            "dir": null,
+            "ref": "main",
+            "url": "https://github.com/Slushi-Github/SL-Windows-API"
+        }
+    ]
+}

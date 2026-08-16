@@ -1,17 +1,15 @@
-package;
+package game.menus;
 
 import flixel.util.FlxSave;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.text.FlxText;
 import flixel.util.FlxTimer;
 import AngelUtils; // for masking and reading json lol
-import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxSpriteGroup;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
-
 using flixel.util.FlxSpriteUtil;
 
 #if windows
@@ -59,12 +57,13 @@ class MainMenuState extends FlxState
 	var woodUsrSwitch:FlxButton;
 	var woodUsrName:FlxText;
 	var woodBroken:FlxSprite;
+
 	// var name:String = 'No Name'; // will change I swear
 
 	override public function create()
 	{
 		super.create();
-	
+
 		FlxG.sound.music.pause(); // for when transitioning back from help
 		if (FlxG.sound.music.playing)
 		{
@@ -99,7 +98,6 @@ class MainMenuState extends FlxState
 		FlxG.sound.play('assets/sounds/roll_in.ogg');
 		background = new FlxSprite();
 		background.makeGraphic(800, 600, FlxColor.WHITE);
-
 
 		DiscordRpc.start({
 			clientID: "884169727415566417",
@@ -175,7 +173,7 @@ class MainMenuState extends FlxState
 			nameInput = new FlxUIInputText(350, 289, 100, '');
 			nameInput.setFormat('assets/fonts/DWARVESC.ttf', 18, 0xFFF5C8, CENTER);
 			nameInput.maxLength = 12;
-			
+
 			// VScode likes to lie about this line, it does actually work.
 			nameInput.color = 0x000000; // Even though the UI isn't finished, make it so you can at least read it! (I was very lazy 3 years ago) - Eliana
 
@@ -215,7 +213,7 @@ class MainMenuState extends FlxState
 		trace("[SYSTEM] trying to load game save data...");
 		if (_gamedata.data.newgame == null)
 		{
-			trace("[GAME DATA] Failed!"); 
+			trace("[GAME DATA] Failed!");
 
 			_gamedata.data.newgame = true;
 			_gamedata.data.world = 1;
@@ -289,7 +287,7 @@ class MainMenuState extends FlxState
 		if (_gamedata.data.newgame == true)
 		{
 			trace("[SYSTEM] New Adventure");
-			LawnState.curLevel = "1-1";
+			game.LawnConfig.curLevel = "1-1";
 		}
 		else
 		{
@@ -307,7 +305,7 @@ class MainMenuState extends FlxState
 
 		new FlxTimer().start(6.5, (tmr:FlxTimer) ->
 		{
-			FlxG.switchState(new LawnState());
+			FlxG.switchState(new game.LawnState());
 		});
 	}
 
@@ -327,11 +325,10 @@ class MainMenuState extends FlxState
 	}
 
 	function openAlmanac()
-		{
-			FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
-			FlxG.switchState(new almanac.AlmanacState());
-
-		}
+	{
+		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
+		FlxG.switchState(new game.menus.almanac.AlmanacState());
+	}
 
 	function fuckYouStop()
 	{
@@ -459,13 +456,13 @@ class MainMenuState extends FlxState
 
 		if (FlxG.mouse.pressed)
 		{
-			//var offscreen:Bool = (FlxG.mouse.screenX < 0 || FlxG.mouse.screenX > FlxG.width || FlxG.mouse.screenY < 0 || FlxG.mouse.screenY > FlxG.height);
+			// var offscreen:Bool = (FlxG.mouse.screenX < 0 || FlxG.mouse.screenX > FlxG.width || FlxG.mouse.screenY < 0 || FlxG.mouse.screenY > FlxG.height);
 			if (draggingMenu /* && !offscreen */)
 			{
-				//var offsetX = FlxG.mouse.screenX - cursorPrevX;
-				//var offsetY = FlxG.mouse.screenY - cursorPrevY;
+				// var offsetX = FlxG.mouse.screenX - cursorPrevX;
+				// var offsetY = FlxG.mouse.screenY - cursorPrevY;
 				// Angel: ditched the variables since they take up more memory, especially if this runs every frame of the game
-				
+
 				optionsMenu.x = menuPrevX + (FlxG.mouse.screenX - cursorPrevX);
 				optionsMenu.y = menuPrevY + (FlxG.mouse.screenY - cursorPrevY);
 				AngelUtils.bounceToFrame(optionsMenu); // Angel: don't even say it Cheese, you're welcome

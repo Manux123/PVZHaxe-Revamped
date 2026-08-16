@@ -5,7 +5,6 @@ import flixel.system.FlxAssets;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.ui.FlxButton;
-import flixel.FlxG;
 import flixel.FlxSprite;
 import AngelUtils; // for masking and reading json lol
 import flixel.FlxState;
@@ -77,7 +76,7 @@ class HelpState extends FlxState
 		FlxG.sound.play('assets/sounds/tap.ogg'); // button sound
 		new FlxTimer().start(0.2, (tmr:FlxTimer) ->
 		{
-			FlxG.switchState(new MainMenuState());
+			FlxG.switchState(new game.menus.MainMenuState());
 		});
 	};
 

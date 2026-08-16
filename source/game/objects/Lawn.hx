@@ -1,6 +1,5 @@
-package;
+package game.objects;
 
-import Plant.PlantableType;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 import haxe.Json;
@@ -41,7 +40,6 @@ class Lawn extends FlxSpriteGroup
 		super(x, y);
 
 		lawnJson = Json.parse(Assets.getText('assets/data/lawns/${backgroundType}.json'));
-		
 
 		this.rows = lawnJson.rows;
 		this.columns = lawnJson.cols;
@@ -81,7 +79,7 @@ class Tile
 		this.storedPlants = [];
 	}
 
-	public function appendPlant(type:PlantableType, callback:Void->Plant)
+	public function appendPlant(type:Plant.PlantableType, callback:Void->Plant)
 	{
 		var isValid = false;
 		if (type == DEFAULT)

@@ -26,6 +26,10 @@
 	<!--Mobile-specific-->
 	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" />
 
+	<!-- ____________________________ Defines ___________________________ -->
+	<define name="VIDEO_ALLOWED" if="cpp"/>
+	<define name="HX_WINDOWS" if="windows cpp"/>
+
 	<!-- _____________________________ Path Settings ____________________________ -->
 
 	<set name="BUILD_DIR" value="export" />
@@ -44,12 +48,9 @@
 	<haxelib name="flixel-addons" />
 	<haxelib name="discord_rpc" if="windows"/>
 	<haxelib name="flxAnimate" />
+	<haxelib name="hxvlc" />
+	<haxelib name="sl-windows-api" if="windows"/>
 
-	<!--In case you want to use the addons package-->
-	<!--<haxelib name="flixel-addons" />-->
-
-	<!--In case you want to use the ui package-->
-	<!--<haxelib name="flixel-ui" />-->
 
 	<!--In case you want to use nape with flixel-->
 	<!--<haxelib name="nape-haxe4" />-->
@@ -78,7 +79,7 @@
 	<!--<haxedef name="FLX_NO_SOUND_SYSTEM" />-->
 
 	<!--Disable the Flixel core focus lost screen-->
-	<!--<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />-->
+	<haxedef name="FLX_NO_FOCUS_LOST_SCREEN" />
 
 	<!--Disable the Flixel core debugger. Automatically gets set whenever you compile in release mode!-->
 	<haxedef name="FLX_NO_DEBUG" unless="debug" />

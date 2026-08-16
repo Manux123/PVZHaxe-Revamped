@@ -1,4 +1,4 @@
-package;
+package game.objects;
 
 import flxanimate.FlxAnimate;
 import flixel.FlxSprite;
@@ -6,7 +6,6 @@ import haxe.Json;
 import flixel.animation.FlxBaseAnimation;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.Assets;
-import flixel.FlxG;
 
 typedef ZAnimLoader =
 {
