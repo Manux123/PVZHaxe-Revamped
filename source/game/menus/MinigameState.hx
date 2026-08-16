@@ -1,18 +1,13 @@
 package game.menus;
 
-import haxe.Json;
 import flixel.FlxSprite;
 import flixel.State;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxSpriteGroup;
-import openfl.Assets;
 import flixel.ui.FlxButton;
-import sys.io.File;
 import sys.FileSystem;
-
-using StringTools;
 
 typedef MinigameJson =
 {

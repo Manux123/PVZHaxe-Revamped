@@ -2,7 +2,6 @@ package game;
 
 import core.json.LevelData;
 import core.api.DiscordRPC;
-import haxe.Exception;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxSprite;
 import flixel.State;
@@ -27,8 +26,6 @@ class LawnState extends State
 	public var plantList:Array<Plant> = [];
 
 	public var plantGrp:FlxTypedGroup<Plant>;
-
-	var zombie:Zombie;
 
 	public var curRow:Int = 0;
 	public var curCol:Int = 0;
@@ -110,14 +107,69 @@ class LawnState extends State
 		plantGrp = new FlxTypedGroup<Plant>();
 		add(plantGrp);
 
-		zombie = new Zombie(800, 180, "basic", true);
-		add(zombie);
-
 		hud = new HUD();
 		hud.cameras = [camHUD];
 		add(hud);
+		hud.initFromLevel(levelData.lawnJson);
+
+		spawnLevelZombies();
 
 		pauseMenu();
+	}
+
+	function spawnLevelZombies():Void
+	{
+		if (levelData.lawnJson.zombies == null)
+			return;
+
+		for (spawnData in levelData.lawnJson.zombies)
+		{
+			var type:String = spawnData.type ?? "basic";
+			var count:Int = spawnData.count ?? 1;
+			var row:Null<Int> = spawnData.row;
+
+			var delay:Float = spawnData.delay ?? 0.0;
+			var isBoss:Bool = spawnData.isBoss ?? false;
+			var flag:Int = spawnData.flag ?? 0;
+
+			for (i in 0...count)
+			{
+				var spawnRow = row != null ? row : Std.int(Math.random() * background.rows);
+				var spawnY = spawnRow * background.tileHei + 45 + tileOffY;
+
+				var createZombie = function()
+				{
+					var z = new Zombie(800, spawnY, type, true);
+					add(z);
+					zombieList.push(z);
+
+					sortZombiesByY();
+				};
+
+				if (delay > 0)
+				{
+					new flixel.util.FlxTimer().start(delay, function(tmr:flixel.util.FlxTimer)
+					{
+						createZombie();
+					});
+				}
+				else
+				{
+					createZombie();
+				}
+			}
+		}
+	}
+
+	function sortZombiesByY():Void
+	{
+		zombieList.sort(function(a, b) return Reflect.compare(a.y, b.y));
+
+		for (z in zombieList)
+		{
+			remove(z, true);
+			add(z);
+		}
 	}
 
 	function applyLawnCamera():Void

@@ -1,5 +1,38 @@
 {
-    "lawn": "grass",
+    "name": "Level 1-1",
+    "world": 1,
+    "lawn": "grassday",
     "flags": 1,
-    "possibleZombies":["basic"]
+    "startingSun": 0,
+    "sunDropRate": 10.0,
+    "sunDropAmount": 25,
+    "seedSlots": 5,
+    "forcedSeeds": [
+        "peashooter"
+    ],
+    "zombies": [
+        {
+            "type": "basic",
+            "flag": 1,
+            "count": 1,
+            "row": 2
+        },
+        {
+            "type": "basic",
+            "flag": 1,
+            "count": 1,
+            "delay": 20,
+            "row": 2
+        }
+    ],
+    "winCondition": {
+        "type": "survive"
+    },
+    "loseCondition": {
+        "type": "brain_eaten"
+    },
+    "reward": {
+        "type": "plant",
+        "plantID": "sunflower"
+    }
 }

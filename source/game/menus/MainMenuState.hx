@@ -5,11 +5,8 @@ import flixel.text.FlxText;
 import flixel.util.FlxTimer;
 import flixel.FlxSprite;
 import flixel.State;
-import flixel.group.FlxSpriteGroup;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
-
-using flixel.util.FlxSpriteUtil;
 
 #if windows
 import core.api.DiscordRPC;

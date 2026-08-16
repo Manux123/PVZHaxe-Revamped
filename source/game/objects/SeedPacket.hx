@@ -18,8 +18,6 @@ class SeedPacket extends FlxSpriteGroup
 		spritePacket = new FlxSprite(x, y);
 		spritePacket.loadGraphic(Paths.image("ui/seedPackets/" + character));
 		spritePacket.antialiasing = true;
-		spritePacket.scale.set(0.4, 0.4);
-		spritePacket.updateHitbox();
 		add(spritePacket);
 		if (notRecommended)
 			spritePacket.color = FlxColor.BLACK;

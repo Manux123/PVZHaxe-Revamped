@@ -32,13 +32,12 @@ class Plant extends flixel.FlxSprite
 
 		shadow = new FlxSprite(0, 0);
 		shadow.loadGraphic(Paths.image('plants/plantshadow'));
-		shadow.alpha = 0.5;
 	}
 
 	override function draw()
 	{
-		shadow.x = x + (width - shadow.width) / 2 - 20;
-		shadow.y = y + height - shadow.height / 2 - 20;
+		shadow.x = x + (width - shadow.width) / 2 - 5;
+		shadow.y = y + height - shadow.height / 2 - 7;
 		shadow.cameras = cameras;
 		shadow.draw();
 
