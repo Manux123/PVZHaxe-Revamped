@@ -27,7 +27,7 @@
 	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" />
 
 	<!-- ____________________________ Defines ___________________________ -->
-	<define name="VIDEO_ALLOWED" if="cpp"/>
+	<define name="VIDEO_ALLOWED" if="cpp" unless="android"/>	
 	<define name="HX_WINDOWS" if="windows cpp"/>
 
 	<!-- _____________________________ Path Settings ____________________________ -->
@@ -48,7 +48,7 @@
 	<haxelib name="flixel-addons" />
 	<haxelib name="discord_rpc" if="windows"/>
 	<haxelib name="flxAnimate" />
-	<haxelib name="hxvlc" />
+	<haxelib name="hxvlc" unless="android" />
 	<haxelib name="sl-windows-api" if="windows"/>
 
 
@@ -99,4 +99,10 @@
 	<icon path="icons/256.png" size='256'/>
 	<icon path="icons/256.png" size='512'/>
 	<icon path="icons/256.png"/>
+
+	<android target-sdk-version="33" minimum-sdk-version="21" />
+
+	<permission name="android.permission.INTERNET" />
+	<permission name="android.permission.WRITE_EXTERNAL_STORAGE" if="android" />
+	<permission name="android.permission.READ_EXTERNAL_STORAGE" if="android" />
 </project>

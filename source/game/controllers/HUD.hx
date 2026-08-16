@@ -19,7 +19,7 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 	public var houseTxt:FlxText;
 
-	public var suns:FlxText;
+	public var sunText:FlxText;
 
 	var menuButton:flixel.ui.FlxButton;
 
@@ -43,6 +43,14 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 		seedBank = new FlxSprite(100, 0).loadGraphic(Paths.image("ui/SeedBank"));
 		add(seedBank);
 
+		sunText = new FlxText(134, 59);
+		sunText.color = 0xFF000000;
+		sunText.font = 'assets/fonts/Brianne_s_hand.ttf';
+		sunText.text = '0';
+		sunText.antialiasing = true;
+		sunText.size = 20;
+		add(sunText);
+
 		for (i in 0...seedPacketList.length)
 		{
 			var seedPacket = new SeedPacket(76 + (i * spaces[0]), -40, seedPacketList[i], 100);
@@ -51,7 +59,7 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 			add(seedPacket);
 		}
 
-		houseTxt = new FlxText(0, 0);
+		houseTxt = new FlxText(FlxG.width * 0.65, FlxG.height * 0.95);
 		houseTxt.color = 0xFFFCC900;
 		houseTxt.borderStyle = OUTLINE;
 		houseTxt.borderSize = 2;

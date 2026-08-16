@@ -19,7 +19,7 @@ class WindowAPI {
 
 	public static function scaleWindow() {
 		#if windows
-		//WindowsAPI.setProgramDPIAware();
+		WindowsAPI.setProgramDPIAware();
 		#end
 		Lib.application.window.x = Std.int((Lib.application.window.display.bounds.width - Lib.application.window.width) / 2);
 		Lib.application.window.y = Std.int((Lib.application.window.display.bounds.height - Lib.application.window.height) / 2);

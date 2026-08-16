@@ -4,7 +4,6 @@ import core.json.LevelData;
 import core.api.DiscordRPC;
 import haxe.Exception;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import openfl.geom.Point;
 import flixel.FlxSprite;
 import flixel.State;
 import game.objects.Zombie;
@@ -39,7 +38,7 @@ class LawnState extends State
 	public var levelData:LevelData;
 
 	// cameras
-	public var camGame:flixel.FlxCamera;
+	public var camGame:flixel.Camera;
 	public var camHUD:flixel.FlxCamera;
 
 	// objects
@@ -47,6 +46,9 @@ class LawnState extends State
 	public var music:DynamicGameMusic;
 
 	public var paused:Bool = false;
+
+	var tileOffX:Float = 0;
+	var tileOffY:Float = 0;
 
 	override public function create()
 	{
@@ -63,7 +65,10 @@ class LawnState extends State
 			AnimationHandler.parseAnimation('data/plants', plant);
 
 		background = new Lawn();
+		camGame.zoom = background.defaultZoom;
 		add(background);
+
+		applyLawnCamera();
 
 		music = new DynamicGameMusic();
 
@@ -87,6 +92,11 @@ class LawnState extends State
 		getLevel();
 
 		tileSpr = new FlxSprite().makeGraphic(Std.int(background.gridWid / background.rows), Std.int(background.gridHei / background.columns), 0x7FFFFFFF);
+		if (background.lawnJson.positionTile != null)
+		{
+			tileOffX = background.lawnJson.positionTile[0];
+			tileOffY = background.lawnJson.positionTile[1];
+		}
 		tileSpr.active = false;
 		add(tileSpr);
 
@@ -100,7 +110,7 @@ class LawnState extends State
 		plantGrp = new FlxTypedGroup<Plant>();
 		add(plantGrp);
 
-		zombie = new Zombie(800, 140, "basic", true);
+		zombie = new Zombie(800, 180, "basic", true);
 		add(zombie);
 
 		hud = new HUD();
@@ -108,6 +118,18 @@ class LawnState extends State
 		add(hud);
 
 		pauseMenu();
+	}
+
+	function applyLawnCamera():Void
+	{
+		var json = background.lawnJson;
+
+		camGame.snapZoom(json.defaultZoom != null ? json.defaultZoom : 1.0);
+
+		if (json.camPos != null)
+			camGame.snapTo(json.camPos[0], json.camPos[1]);
+		else
+			camGame.snapTo(0, 0);
 	}
 
 	function pauseMenu()
@@ -119,6 +141,8 @@ class LawnState extends State
 
 			if (FlxG.sound.music != null)
 				FlxG.sound.music.pause();
+
+			FlxG.sound.play(Paths.sound('pause'));
 
 			persistentUpdate = false;
 			persistentDraw = true;
@@ -196,8 +220,9 @@ class LawnState extends State
 		FlxG.watch.add(plantSelectedIndex, "String", "curPlantSelected");
 
 		// Funni thingie just gets what tile the mouse is currently on
-		curRow = Std.int(Math.max(0, Math.min(background.rows - 1, Math.round((FlxG.mouse.x - 30 - background.tileWid / 2) / background.tileWid))));
-		curCol = Std.int(Math.max(0, Math.min(background.columns - 1, Math.round((FlxG.mouse.y - 75 - background.tileHei / 2) / background.tileHei))));
+		curRow = Std.int(Math.max(0, Math.min(background.rows - 1, Math.round((FlxG.mouse.x - 30 - tileOffX - background.tileWid / 2) / background.tileWid))));
+		curCol = Std.int(Math.max(0,
+			Math.min(background.columns - 1, Math.round((FlxG.mouse.y - 75 - tileOffY - background.tileHei / 2) / background.tileHei))));
 
 		var currentTile = background.tileData[curRow][curCol];
 		var isValid = false;
@@ -208,10 +233,10 @@ class LawnState extends State
 		else if (plantOverlay.plantableType == SECONDARY)
 			isValid = !currentTile.hasSECONDARY;
 
-		tileSpr.visible = plantOverlay.visible = FlxG.mouse.x >= 30
-			&& FlxG.mouse.x <= background.gridWid + 30
-			&& FlxG.mouse.y >= 75
-			&& FlxG.mouse.y <= background.gridHei + 75
+		tileSpr.visible = plantOverlay.visible = FlxG.mouse.x >= 30 + tileOffX
+			&& FlxG.mouse.x <= background.gridWid + 30 + tileOffX
+			&& FlxG.mouse.y >= 75 + tileOffY
+			&& FlxG.mouse.y <= background.gridHei + 75 + tileOffY
 			&& isValid;
 
 		if (tileSpr.visible)
@@ -222,7 +247,7 @@ class LawnState extends State
 
 	function initializeCameras()
 	{
-		camGame = new flixel.FlxCamera();
+		camGame = new flixel.Camera();
 		FlxG.cameras.reset(camGame);
 
 		camHUD = new flixel.FlxCamera();
@@ -233,7 +258,7 @@ class LawnState extends State
 	private function placePlant()
 	{
 		var currentTile = background.tileData[curRow][curCol];
-		tileSpr.setPosition(curRow * background.tileWid + 30, curCol * background.tileHei + 75);
+		tileSpr.setPosition(curRow * background.tileWid + 30 + tileOffX, curCol * background.tileHei + 75 + tileOffY);
 		plantOverlay.setPosition(tileSpr.x + 7.5, tileSpr.y + 12.5);
 
 		if (FlxG.mouse.justPressed && plantOverlay.visible)
@@ -241,6 +266,7 @@ class LawnState extends State
 			#if debug
 			trace('At Row ${curRow + 1}, Coloumn: ${curCol + 1}');
 			#end
+			FlxG.sound.play(Paths.sound('plant'));
 			currentTile.appendPlant(plantOverlay.plantableType, () -> plantGrp.add(new Plant(plantOverlay.x, plantOverlay.y)));
 		}
 	}

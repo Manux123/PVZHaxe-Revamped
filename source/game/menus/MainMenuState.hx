@@ -46,6 +46,8 @@ class MainMenuState extends State
 	var woodUsrName:FlxText;
 	var woodBroken:FlxSprite;
 
+	var acceptOption:Bool = false;
+
 	// var name:String = 'No Name'; // will change I swear
 
 	override public function create()
@@ -69,7 +71,6 @@ class MainMenuState extends State
 		#if windows
 		DiscordRPC.changePressence('In the Main Menu.');
 		#end
-
 
 		// Background Shit \\
 		sky = new FlxSprite().loadGraphic('assets/images/menu/mainmenu/SelectorScreen_BG.jpg');
@@ -236,8 +237,10 @@ class MainMenuState extends State
 
 	function openAdventure()
 	{
+		acceptOption = true;
 		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
 		fuckYouStop();
+
 		if (GameSave.isNewGame)
 		{
 			trace("[SYSTEM] New Adventure");
@@ -252,12 +255,19 @@ class MainMenuState extends State
 
 		FlxG.sound.music.stop();
 		FlxG.sound.play('assets/sounds/losemusic.ogg');
-		new FlxTimer().start(1.5, (tmr:FlxTimer) ->
-		{
-			FlxG.sound.play('assets/sounds/evillaugh.ogg');
-		});
 
-		new FlxTimer().start(6.5, (tmr:FlxTimer) ->
+		var wait:Float = 0;
+
+		if (GameSave.isNewGame)
+		{
+			new FlxTimer().start(1.5, (tmr:FlxTimer) ->
+			{
+				FlxG.sound.play('assets/sounds/evillaugh.ogg');
+			});
+			wait = 6.5;
+		}
+
+		new FlxTimer().start(wait, (tmr:FlxTimer) ->
 		{
 			FlxG.switchState(new game.LawnState());
 		});
@@ -265,6 +275,9 @@ class MainMenuState extends State
 
 	function openMinigames()
 	{
+		if (acceptOption)
+			return;
+
 		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
 		if (GameSave.minigamesUnlocked)
 		{
@@ -280,6 +293,8 @@ class MainMenuState extends State
 
 	function openAlmanac()
 	{
+		if (acceptOption)
+			return;
 		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
 		FlxG.switchState(new game.menus.almanac.AlmanacState());
 	}
@@ -295,6 +310,8 @@ class MainMenuState extends State
 
 	function optionsShit()
 	{
+		if (acceptOption)
+			return;
 		FlxG.sound.play('assets/sounds/tap.ogg');
 		fuckYouStop();
 		persistentUpdate = false;
@@ -304,6 +321,8 @@ class MainMenuState extends State
 
 	function helpShit()
 	{
+		if (acceptOption)
+			return;
 		FlxG.sound.play('assets/sounds/tap.ogg'); // button sound
 		FlxG.sound.music.stop();
 		new FlxTimer().start(0.2, (tmr:FlxTimer) ->
@@ -314,6 +333,8 @@ class MainMenuState extends State
 
 	function quitShit()
 	{
+		if (acceptOption)
+			return;
 		FlxG.sound.play('assets/sounds/tap.ogg'); // button sound
 		// !!IMPORTANT: GET A MENU BEFORE CLOSING!! \\
 		lime.system.System.exit(0);
@@ -328,15 +349,6 @@ class MainMenuState extends State
 		if (false)
 		{
 			DiscordRPC.shutdown();
-		}
-		#end
-
-		#if debug
-		DebugUtils.debug(nameTitle);
-		DebugUtils.debug(nameSubTitle);
-		if (FlxG.keys.pressed.R && FlxG.keys.pressed.CONTROL) // refresh lol
-		{
-			FlxG.resetGame();
 		}
 		#end
 	}

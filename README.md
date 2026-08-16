@@ -23,15 +23,12 @@ This project softcodes most aspect of PvZ, so that means you can:
 All there is to know on compiling this game!
 ### <p align="center">Requirements</p>
 
-1. Install [Haxe 4.1.5](https://haxe.org/download/version/4.1.5/)
-(Download 4.1.5 instead of 4.2.0 because 4.2.0 is broken and is not working with gits properly...) *not stolen from the FNF GitHub, I would do no such thing*
+1. Install [Haxe Latest Version](https://haxe.org/download/)
 2. Install [HaxeFlixel](https://haxeflixel.com/documentation/install-haxeflixel/)
 3. Run these commands in a Command Prompt Window ~~or PowerShell if you're weird~~:
 ```bash
-haxelib install flixel
-haxelib install flixel-addons
-haxelib install flixel-ui
-haxelib git flxanimate https://github.com/Dot-Stuff/flxanimate
+haxelib install hmm
+haxelib run hmm install
 ```
 You also need Git, cause discord RPC and shit. Dumb, I know.
 1. Install [git-scm](https://git-scm.com/downloads)

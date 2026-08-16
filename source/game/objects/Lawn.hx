@@ -5,23 +5,22 @@ import flixel.group.FlxSpriteGroup;
 import haxe.Json;
 import openfl.utils.Assets;
 
-// enum LawnTimes {
-// 	DAY;
-// 	NIGHT;
-// }
-
 typedef LawnData =
 {
-	var spriteOffsetX:Int;
-	var spriteOffsetY:Int;
-	var cols:Int;
-	var rows:Int;
-	//var time:LawnTimes;
+	var ?defaultZoom:Float;
+	var ?cols:Int;
+	var ?rows:Int;
+	var ?position:Array<Float>;
+	var ?positionTile:Array<Float>;
+	var ?scale:Array<Float>;
+	var ?camPos:Array<Float>;
 }
 
 class Lawn extends FlxSpriteGroup
 {
 	public var lawnJson:LawnData;
+
+	public var defaultZoom:Float = 1;
 
 	public var columns:Int;
 	public var rows:Int;
@@ -41,16 +40,28 @@ class Lawn extends FlxSpriteGroup
 
 		lawnJson = Json.parse(Assets.getText('assets/data/lawns/${backgroundType}.json'));
 
+		if (lawnJson == null)
+		{
+			trace('Error to loading the lawn Json');
+			return;
+		}
+
+		if (lawnJson.defaultZoom != null)
+			defaultZoom = lawnJson.defaultZoom;
+
 		this.rows = lawnJson.rows;
 		this.columns = lawnJson.cols;
 		this.type = backgroundType;
 
 		tileData = [for (i in 0...rows) [for (j in 0...column) new Tile()]];
 		lawnSprite = new FlxSprite();
-		lawnSprite.loadGraphic('assets/images/levels/${backgroundType}/${backgroundType}.png');
+		lawnSprite.loadGraphic(Paths.image('levels/${backgroundType}/${backgroundType}'));
 		lawnSprite.active = false;
-		lawnSprite.offset.x = lawnJson.spriteOffsetX;
-		lawnSprite.offset.y = lawnJson.spriteOffsetY;
+		lawnSprite.x += lawnJson.position[0];
+		lawnSprite.y += lawnJson.position[1];
+		if (lawnJson.scale != null)
+			lawnSprite.scale.set(lawnJson.scale[0], lawnJson.scale[1]);
+		lawnSprite.updateHitbox();
 		add(lawnSprite);
 	}
 
