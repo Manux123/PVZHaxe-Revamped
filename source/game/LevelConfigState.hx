@@ -1,12 +1,12 @@
-package;
+package game;
 
 import flixel.FlxSprite;
 import haxe.Json;
-import flixel.FlxState;
+import flixel.State;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.addons.ui.FlxUIDropDownMenu;
 
-class LevelConfigState extends FlxState
+class LevelConfigState extends State
 {
 	var background:FlxSprite;
 	var titleTxt:FlxText;

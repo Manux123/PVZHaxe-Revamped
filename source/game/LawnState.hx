@@ -1,39 +1,24 @@
 package game;
 
 import core.json.LevelData;
-import discord_rpc.DiscordRpc;
+import core.api.DiscordRPC;
 import haxe.Exception;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import openfl.geom.Point;
-import flixel.util.FlxSave;
-import AngelUtils; // for json reading
 import flixel.FlxSprite;
-import flixel.FlxState;
+import flixel.State;
 import game.objects.Zombie;
 import game.objects.Plant;
 import game.objects.Lawn;
 import game.controllers.HUD;
 import core.audio.DynamicGameMusic;
+import core.sprites.AnimationHandler;
 
-class LawnState extends FlxState
+class LawnState extends State
 {
-	override public function onFocus()
-	{
-		super.onFocus();
-		FlxG.sound.music.resume();
-		trace("[SYSTEM] User Focused the window");
-	}
-
-	override public function onFocusLost()
-	{
-		super.onFocusLost();
-		FlxG.sound.music.pause();
-		trace("[SYSTEM] User Lost Focus the window");
-	}
+	public static var instance:LawnState;
 
 	var background:Lawn;
-
-	var _gamedata:FlxSave;
 
 	var levelType = 'grass';
 
@@ -43,6 +28,8 @@ class LawnState extends FlxState
 	public var plantList:Array<Plant> = [];
 
 	public var plantGrp:FlxTypedGroup<Plant>;
+
+	var zombie:Zombie;
 
 	public var curRow:Int = 0;
 	public var curCol:Int = 0;
@@ -59,11 +46,13 @@ class LawnState extends FlxState
 	public var hud:HUD;
 	public var music:DynamicGameMusic;
 
-	var menuButton:flixel.ui.FlxButton;
+	public var paused:Bool = false;
 
 	override public function create()
 	{
 		super.create();
+
+		instance = this;
 
 		initializeCameras();
 		levelData = new LevelData();
@@ -75,6 +64,25 @@ class LawnState extends FlxState
 
 		background = new Lawn();
 		add(background);
+
+		music = new DynamicGameMusic();
+
+		if (GameSave.world == 1)
+		{
+			levelType = 'grass';
+			if (GameSave.level <= 3)
+				levelType = 'grass_dirt';
+		}
+		else if (GameSave.world == 2)
+			levelType = 'night';
+		else if (GameSave.world == 3)
+			levelType = 'pool';
+		else if (GameSave.world == 4)
+			levelType = 'pool_night';
+		else if (GameSave.world == 5)
+			levelType = 'roof';
+		else if (GameSave.world == 6)
+			levelType = 'roof_night';
 
 		getLevel();
 
@@ -92,49 +100,33 @@ class LawnState extends FlxState
 		plantGrp = new FlxTypedGroup<Plant>();
 		add(plantGrp);
 
+		zombie = new Zombie(800, 140, "basic", true);
+		add(zombie);
+
 		hud = new HUD();
 		hud.cameras = [camHUD];
 		add(hud);
 
-		menuButton = new flixel.ui.FlxButton(681, -12, '', pauseBitch);
-		menuButton.loadGraphic('assets/images/menu/inGamePause.png', true, 117, 48);
-		add(menuButton);
-
-		// game data \\
-		_gamedata = new FlxSave();
-		_gamedata.bind("Save");
-		// Level shit \\
-		if (_gamedata.data.world == 1)
-		{
-			levelType = 'grass';
-			if (_gamedata.data.level == 1 || _gamedata.data.level == 2 || _gamedata.data.level == 3)
-			{
-				levelType = 'grass_dirt';
-			}
-		}
-		else if (_gamedata.data.world == 2)
-		{
-			levelType = 'night';
-		}
-		else if (_gamedata.data.world == 3)
-		{
-			levelType = 'pool';
-		}
-		else if (_gamedata.data.world == 4)
-		{
-			levelType = 'pool_night';
-		}
-		else if (_gamedata.data.world == 5)
-		{
-			levelType = 'roof';
-		}
-		else if (_gamedata.data.world == 6)
-		{
-			levelType = 'roof_night';
-		}
+		pauseMenu();
 	}
 
-	function pauseBitch() {}
+	function pauseMenu()
+	{
+		hud.pauseBitch = function()
+		{
+			if (paused)
+				return;
+
+			if (FlxG.sound.music != null)
+				FlxG.sound.music.pause();
+
+			persistentUpdate = false;
+			persistentDraw = true;
+			paused = true;
+
+			openSubState(new game.menus.substate.PauseSubstate());
+		};
+	}
 
 	function getLevel()
 	{
@@ -142,86 +134,63 @@ class LawnState extends FlxState
 		switch (levelType)
 		{
 			case 'grass_dirt':
-				DiscordRpc.presence({
-					details: 'Version: [PRIVATE BETA 2]',
-					state: 'Waiting for User Input...',
-					largeImageKey: 'discord_rpc_512',
-					largeImageText: 'Plants VS Zombies: Haxe Edition'
-				});
+				DiscordRPC.changePressence('Waiting for User Input...');
 				background.reloadImage('assets/images/levels/grassday/grassday_dirt.png');
 				music.audioGame(1, 'grasswalk');
 			case 'grass':
-				DiscordRpc.presence({
-					details: 'Version: [PRIVATE BETA 2]',
-					state: 'Waiting for User Input...',
-					largeImageKey: 'discord_rpc_512',
-					largeImageText: 'Plants VS Zombies: Haxe Edition'
-				});
+				DiscordRPC.changePressence('Waiting for User Input...');
 				background.reloadImage('assets/images/levels/grassday/grassday.png');
 				music.audioGame(1, 'grasswalk');
 
 			case 'night':
-				DiscordRpc.presence({
-					details: 'Version: [PRIVATE BETA 2]',
-					state: 'Waiting for User Input...',
-					largeImageKey: 'discord_rpc_512',
-					largeImageText: 'Plants VS Zombies: Haxe Edition'
-				});
+				DiscordRPC.changePressence('Waiting for User Input...');
 				background.reloadImage('assets/images/levels/grassnight/grassnight.jpg');
 				music.audioGame(2, 'moongrains');
 			case 'pool':
-				DiscordRpc.presence({
-					details: 'Version: [PRIVATE BETA 2]',
-					state: 'Waiting for User Input...',
-					largeImageKey: 'discord_rpc_512',
-					largeImageText: 'Plants VS Zombies: Haxe Edition'
-				});
+				DiscordRPC.changePressence('Waiting for User Input...');
 				background.reloadImage('assets/images/levels/poolday/poolday.jpg');
-				if (_gamedata.data.fastpool == true)
-				{
+				if (GameSave.fastPool)
 					music.audioGame(3, 'watery_graves_fast');
-				}
 				else
-				{
 					music.audioGame(3, 'watery_graves');
-				}
 			case 'night_pool':
-				DiscordRpc.presence({
-					details: 'Version: [PRIVATE BETA 2]',
-					state: 'Waiting for User Input...',
-					largeImageKey: 'discord_rpc_512',
-					largeImageText: 'Plants VS Zombies: Haxe Edition'
-				});
+				DiscordRPC.changePressence('Waiting for User Input...');
 				background.reloadImage('assets/images/levels/poolnight/poolnight.jpg');
 				music.audioGame(4, 'rigor_moris');
 			case 'roof':
-				DiscordRpc.presence({
-					details: 'Version: [PRIVATE BETA 2]',
-					state: 'Playing Adventure',
-					smallImageKey: 'discord_rpc_512_adventure',
-					smallImageText: 'Playing: ' + _gamedata.data.world + '-' + _gamedata.data.level,
-					largeImageKey: 'discord_rpc_512',
-					largeImageText: 'Plants VS Zombies: Haxe Edition'
-				});
+				DiscordRPC.changePressence('Playing Adventure', 'Version: [PRIVATE BETA 2]', 'discord_rpc_512', 'Plants VS Zombies: Haxe Edition',
+					'discord_rpc_512_adventure', 'Playing: '
+					+ GameSave.world
+					+ '-'
+					+ GameSave.level);
 				background.reloadImage('assets/images/levels/roofday/roofday.jpg');
 				music.audioGame(5, 'graze_the_roof');
 			case 'roof_night':
-				DiscordRpc.presence({
-					details: 'Version: [PRIVATE BETA 2]',
-					state: 'Playing the final Adventure Level!',
-					largeImageKey: 'discord_rpc_512',
-					smallImageKey: 'discord_rpc_512_boss',
-					smallImageText: 'holy shit they are about to beat the game, partly',
-					largeImageText: 'Plants VS Zombies: Haxe Edition'
-				});
+				DiscordRPC.changePressence('Playing the final Adventure Level!', 'Version: [PRIVATE BETA 2]', 'discord_rpc_512',
+					'Plants VS Zombies: Haxe Edition', 'discord_rpc_512_boss', 'holy shit they are about to beat the game, partly');
 				background.reloadImage('assets/images/levels/roofnight/roofnight.jpg');
 				music.audioGame(5, 'brainiac_maniac');
 		}
 	}
 
+	override public function onFocus()
+	{
+		super.onFocus();
+	}
+
+	override public function onFocusLost()
+	{
+		super.onFocusLost();
+		if (!paused && hud.pauseBitch != null)
+			hud.pauseBitch();
+	}
+
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+
+		if (paused)
+			return;
 
 		var plantSelectedIndex:Int = Std.int(Plant.plantIDs.indexOf(selectedPlant));
 		FlxG.watch.add(plantSelectedIndex, "String", "curPlantSelected");
@@ -278,6 +247,9 @@ class LawnState extends FlxState
 
 	override public function destroy()
 	{
+		zombieList = null;
+		plantList = null;
+
 		super.destroy();
 	}
 }

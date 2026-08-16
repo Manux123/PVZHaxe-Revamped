@@ -75,9 +75,11 @@ class FPS extends TextField
 		var currentCount = times.length;
 		currentFPS = Math.round((currentCount + cacheCount) / 2);
 
+		var currentMem:Float = openfl.system.System.totalMemory;
+
 		if (currentCount != cacheCount /*&& visible*/)
 		{
-			text = "FPS: " + currentFPS + "   (PvZ Haxe Engine)";
+			text = "FPS: " + currentFPS + " - APP: " + formatRam(currentMem) + "   (PvZ Haxe Engine)";
 
 			#if (gl_stats && !disable_cffi && (!html5 || !canvas))
 			text += "\ntotalDC: " + Context3DStats.totalDrawCalls();
@@ -87,5 +89,14 @@ class FPS extends TextField
 		}
 
 		cacheCount = currentCount;
+	}
+
+	public function formatRam(r:Float):String {
+		var mb = r / (1024 * 1024);
+		if (mb >= 1024) {
+			var gb = mb / 1024;
+			return (Math.round(gb * 100) / 100) + ' GB';
+		}
+		return (Math.round(mb * 100) / 100) + ' MB';
 	}
 }

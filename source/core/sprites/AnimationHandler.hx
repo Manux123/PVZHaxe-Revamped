@@ -1,3 +1,5 @@
+package core.sprites;
+
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.geom.Point;
@@ -29,6 +31,10 @@ class AnimationHandler
 			animations[key].sprite.animation.addByPrefix(anim.prefix, anim.postfix, anim.fps, anim.looped);
 			animations[key].offsets[anim.prefix] = new Point(anim.x, anim.y);
 		}
+
+		var g = animations[key].sprite.graphic;
+		if (g != null && g.bitmap != null)
+			g.bitmap.disposeImage();
 	}
 }
 

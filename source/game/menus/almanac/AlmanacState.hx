@@ -1,12 +1,12 @@
 package game.menus.almanac;
 
 import flixel.FlxSprite;
-import flixel.FlxState;
+import flixel.State;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 
-class AlmanacState extends FlxState
+class AlmanacState extends State
 {
 	var background:FlxSprite;
 	var titleTxt:FlxText;
@@ -41,7 +41,7 @@ class AlmanacState extends FlxState
 		exitText.size = 16;
 		add(exitText);
 
-		plantButton = new FlxButton(130, FlxG.height - 245, "", exitAlmanac);
+		plantButton = new FlxButton(130, FlxG.height - 245, "", enterPlant);
 		plantButton.loadGraphic('assets/images/menu/almanac/viewplant.png', true, 156, 42);
 		add(plantButton);
 	}

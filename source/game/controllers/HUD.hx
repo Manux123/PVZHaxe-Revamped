@@ -21,7 +21,19 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 	public var suns:FlxText;
 
-	public function new() {
+	var menuButton:flixel.ui.FlxButton;
+
+	var spaces:Array<Int> = [
+		45, // 6 spaces plants
+		40, // 7 spaces plants
+		35,  // 8 spaces plants
+		30, // 9 spaces plants
+	];
+
+	public var pauseBitch:Void->Void;
+
+	public function new()
+	{
 		super();
 		createHUD();
 	}
@@ -33,20 +45,31 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 		for (i in 0...seedPacketList.length)
 		{
-			var seedPacket = new SeedPacket(80 + (i * 50), -50, seedPacketList[i], 100);
+			var seedPacket = new SeedPacket(76 + (i * spaces[0]), -40, seedPacketList[i], 100);
 			seedPacket.scale.set(0.6, 0.6);
 			seedPacket.updateHitbox();
 			add(seedPacket);
 		}
 
 		houseTxt = new FlxText(0, 0);
-		houseTxt.color = FlxColor.WHITE;
+		houseTxt.color = 0xFFFCC900;
 		houseTxt.borderStyle = OUTLINE;
 		houseTxt.borderSize = 2;
 		houseTxt.font = 'assets/fonts/HouseofTerror-Regular.ttf';
-		houseTxt.text = game.LawnConfig.displayLevel;
-		houseTxt.size = 32;
+		houseTxt.text = "Level: " + game.LawnConfig.displayLevel;
+		houseTxt.antialiasing = true;
+		houseTxt.size = 20;
 		houseTxt.active = false;
 		add(houseTxt);
+
+		menuButton = new flixel.ui.FlxButton(681, -12, '', onPausePressed);
+		menuButton.loadGraphic('assets/images/menu/inGamePause.png', true, 117, 48);
+		add(menuButton);
+	}
+
+	function onPausePressed()
+	{
+		if (pauseBitch != null)
+			pauseBitch();
 	}
 }

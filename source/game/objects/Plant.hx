@@ -1,6 +1,7 @@
 package game.objects;
 
-import AnimationHandler.Animation;
+import core.sprites.AnimationHandler;
+import flixel.FlxSprite;
 
 class Plant extends flixel.FlxSprite
 {
@@ -14,6 +15,8 @@ class Plant extends flixel.FlxSprite
 	public var isAsleep:Bool;
 	public var isShooting:Bool;
 
+	var shadow:FlxSprite;
+
 	public function new(x:Float = 0, y:Float = 0, plantID:Int = 0, plantableType:PlantableType = DEFAULT, plantType:PlantType = ALL)
 	{
 		super(x, y);
@@ -26,12 +29,32 @@ class Plant extends flixel.FlxSprite
 		animation.copyFrom(_handler.sprite.animation);
 		animation.play("idle");
 		updateHitbox();
+
+		shadow = new FlxSprite(0, 0);
+		shadow.loadGraphic(Paths.image('plants/plantshadow'));
+		shadow.alpha = 0.5;
+	}
+
+	override function draw()
+	{
+		shadow.x = x + (width - shadow.width) / 2 - 20;
+		shadow.y = y + height - shadow.height / 2 - 20;
+		shadow.cameras = cameras;
+		shadow.draw();
+
+		super.draw();
 	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		updateHitbox();
+	}
+
+	override function destroy()
+	{
+		shadow.destroy();
+		shadow = null;
+		super.destroy();
 	}
 
 	public function attack(projectile:String):Void {}

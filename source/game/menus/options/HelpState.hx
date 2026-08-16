@@ -1,4 +1,4 @@
-package;
+package game.menus.options;
 
 import flixel.util.FlxTimer;
 import flixel.system.FlxAssets;
@@ -6,17 +6,15 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.ui.FlxButton;
 import flixel.FlxSprite;
-import AngelUtils; // for masking and reading json lol
-import flixel.FlxState;
-import DebugUtils;
+import flixel.State;
 
 using flixel.util.FlxSpriteUtil;
 
 #if windows
-import discord_rpc.DiscordRpc;
+import core.api.DiscordRPC;
 #end
 
-class HelpState extends FlxState
+class HelpState extends State
 {
 	var bg:FlxSprite;
 	var paper:FlxSprite;
@@ -28,18 +26,7 @@ class HelpState extends FlxState
 	{
 		super.create();
 		FlxAssets.FONT_DEFAULT = 'assets/fonts/DWARVESC.ttf';
-		DiscordRpc.start({
-			clientID: "884169727415566417",
-			onReady: onReady,
-			onError: onError,
-			onDisconnected: onDisconnected
-		});
-		DiscordRpc.presence({
-			details: 'Version: [PRIVATE BETA 2]',
-			state: 'Reading Help.',
-			largeImageKey: 'discord_rpc_512',
-			largeImageText: 'Plants VS Zombies: Haxe Edition'
-		});
+		DiscordRPC.changePressence('Reading Help.');
 
 		button = new FlxButton(325, 521, '', goBack);
 		button.loadGraphic('assets/images/notes/help_Button.png', true, 156, 42);
@@ -85,27 +72,5 @@ class HelpState extends FlxState
 		super.update(elapsed);
 
 		DebugUtils.debug(text);
-	}
-
-	// I just stole the fuckin' code from the github lol \\
-	static function onReady()
-	{
-		// Updating Discord Rich Presence
-		DiscordRpc.presence({
-			details: 'Version: [PRIVATE BETA 2]',
-			state: 'Reading help.',
-			largeImageKey: 'discord_rpc_512',
-			largeImageText: 'Plants VS Zombies: Haxe Edition'
-		});
-	}
-
-	static function onError(_code:Int, _message:String)
-	{
-		trace('[DISCORD RPC] Error! $_code : $_message');
-	}
-
-	static function onDisconnected(_code:Int, _message:String)
-	{
-		trace('[DISCORD RPC] Disconnected! $_code : $_message');
 	}
 }

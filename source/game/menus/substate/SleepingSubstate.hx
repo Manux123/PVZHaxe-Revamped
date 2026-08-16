@@ -1,4 +1,4 @@
-package;
+package game.menus.substate;
 
 import flixel.ui.FlxButton;
 import flixel.FlxSprite;
@@ -6,7 +6,6 @@ import flixel.FlxSubState;
 
 class SleepingSubState extends FlxSubState
 {
-
 	override public function create():Void
 	{
 		super.create();

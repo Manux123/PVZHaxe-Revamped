@@ -3,7 +3,7 @@ package game.menus.almanac;
 // WIP
 
 import flixel.FlxSprite;
-import flixel.FlxState;
+import flixel.State;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
@@ -24,7 +24,7 @@ typedef PageEntryPlants =
 	var page:Array<AlmanacJsonPlants>;
 }
 
-class ZombieEntryPage extends FlxState
+class ZombieEntryPage extends State
 {
 	var background:FlxSprite;
 	var titleTxt:FlxText;
@@ -51,9 +51,6 @@ class ZombieEntryPage extends FlxState
 		titleTxt.font = 'assets/fonts/HouseofTerror-Regular.ttf';
 		titleTxt.screenCenter(X); // i can't see no diference
 		add(titleTxt);
-
-		background = new FlxSprite(0, 0).loadGraphic("assets/images/menu/almanac/Almanac_PlantBack.png");
-		add(background);
 
 		exitButton = new FlxButton(700, FlxG.height - 35, "", exitAlmanac);
 		exitButton.loadGraphic('assets/images/menu/almanac/Almanac_CloseButton.png', true, 89, 26);

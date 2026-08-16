@@ -2,7 +2,7 @@ package game.menus;
 
 import haxe.Json;
 import flixel.FlxSprite;
-import flixel.FlxState;
+import flixel.State;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -30,7 +30,7 @@ typedef Page =
 	var page:Array<MinigameJson>;
 }
 
-class MinigameState extends FlxState
+class MinigameState extends State
 {
 	var background:FlxSprite;
 	var titleTxt:FlxText; // minigame text at the top of screen
@@ -113,6 +113,7 @@ class MinigameState extends FlxState
 	private function changePage(pageInt:Int = 0)
 	{
 		minigameJson = AngelUtils.JsonifyFile('assets/data/minigames/page${curPage}.json');
+		windowGroup.forEach(w -> w.destroy());
 		windowGroup.clear();
 
 		for (pageData in minigameJson.page)
@@ -217,19 +218,26 @@ class ChallengeWindow extends FlxSpriteGroup
 		add(minigameName);
 	}
 
+	var _isHighlighted:Bool = false;
+
 	override public function update(elapsed:Float)
 	{
 		if (!lockedGame)
 		{
-			if (FlxG.mouse.overlaps(this))
+			var hovering = FlxG.mouse.overlaps(this);
+			if (hovering != _isHighlighted)
 			{
-				window.loadGraphic("assets/images/menu/minigames/Challenge_Window_Highlight.png");
-				minigameName.color = FlxColor.RED;
-			}
-			else
-			{
-				window.loadGraphic("assets/images/menu/minigames/Challenge_Window.png");
-				minigameName.color = MinigameState.buttonColor;
+				_isHighlighted = hovering;
+				if (hovering)
+				{
+					window.loadGraphic("assets/images/menu/minigames/Challenge_Window_Highlight.png");
+					minigameName.color = FlxColor.RED;
+				}
+				else
+				{
+					window.loadGraphic("assets/images/menu/minigames/Challenge_Window.png");
+					minigameName.color = MinigameState.buttonColor;
+				}
 			}
 			if (FlxG.mouse.pressed && FlxG.mouse.overlaps(this))
 			{

@@ -1,22 +1,21 @@
 package game.menus;
 
-import flixel.util.FlxSave;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.text.FlxText;
 import flixel.util.FlxTimer;
-import AngelUtils; // for masking and reading json lol
 import flixel.FlxSprite;
-import flixel.FlxState;
+import flixel.State;
 import flixel.group.FlxSpriteGroup;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
+
 using flixel.util.FlxSpriteUtil;
 
 #if windows
-import discord_rpc.DiscordRpc;
+import core.api.DiscordRPC;
 #end
 
-class MainMenuState extends FlxState
+class MainMenuState extends State
 {
 	// background stuff \\
 	var selectMenu:FlxSprite;
@@ -24,16 +23,6 @@ class MainMenuState extends FlxState
 	var sky:FlxSprite;
 	var backdrop:FlxSprite;
 	var background:FlxSprite;
-	// Options Menu \\
-	var optionsMenu:FlxSpriteGroup;
-	var optionsBG:FlxSprite;
-	var optionsOk:FlxButton;
-	var optionsOkText:FlxText;
-	var optionsOkTextShadow:FlxText;
-	var optionsOpen = false;
-	// Options \\
-	var musicVolume:Float;
-	var soundVolume:Float;
 
 	// Select Menu Buttons \\
 	/* ==Menu Button Pathss==
@@ -42,7 +31,6 @@ class MainMenuState extends FlxState
 		Adventure: 'assets/images/menu/mainmenu/SelectorScreen_Adventure_Button.png'
 		Adventure Shadow: 'assets/images/menu/mainmenu/SelectorScreen_Shadow_Adventure.png'
 	 */
-	var _gamedata:FlxSave;
 	var adventure:FlxButton;
 	var adventure_shadow:FlxSprite;
 	var minigame:FlxButton;
@@ -64,56 +52,24 @@ class MainMenuState extends FlxState
 	{
 		super.create();
 
-		FlxG.sound.music.pause(); // for when transitioning back from help
-		if (FlxG.sound.music.playing)
-		{
-			FlxG.sound.music.resume();
-		}
-		else
-		{
-			FlxG.sound.music.play();
-		}
+		core.audio.DynamicGameMusic.musicMenu(Paths.music("main_menu_theme"));
 
-		// Initializing Game Save
-		_gamedata = new FlxSave();
-		_gamedata.bind("Save");
-
-		// wood buttons \\
-
-		woodName = new FlxSprite(22, -8).loadGraphic('assets/images/menu/mainmenu/SelectorScreen_WoodSign1.png');
+		woodName = new FlxSprite(22, -8).loadGraphic(Paths.image('menu/mainmenu/SelectorScreen_WoodSign1'));
 		woodUsrSwitch = new FlxButton(25, 126);
-		woodUsrSwitch.loadGraphic('assets/images/menu/mainmenu/ScreenSelector_WoodSign_Button.png', true, 291, 71);
+		woodUsrSwitch.loadGraphic(Paths.image('menu/mainmenu/ScreenSelector_WoodSign_Button'), true, 291, 71);
 		woodUsrName = new FlxText(147, 86);
-		woodUsrName.setFormat('assets/fonts/Brianne_s_hand.ttf', 18, 0xFFF5C8, CENTER); // WHY IS THE E DIFFERENTTTTTTTTTTTTTTTTTT
-		woodUsrName.text = "Unknown!"; // We don't have a name yet
-		woodBroken = new FlxSprite(32, 179).loadGraphic('assets/images/menu/mainmenu/SelectorScreen_WoodSign3.png');
+		woodUsrName.setFormat(Paths.font('Brianne_s_hand'), 18, 0xFFF5C8, CENTER); // WHY IS THE E DIFFERENTTTTTTTTTTTTTTTTTT
+		woodUsrName.text = GameSave.playerName != null ? GameSave.playerName + '!' : "Unknown!"; // We don't have a name yet
+		woodBroken = new FlxSprite(32, 179).loadGraphic(Paths.image('menu/mainmenu/SelectorScreen_WoodSign3'));
 
-		// Options Menu \\
-
-		optionsMenu = new FlxSpriteGroup();
-		optionsOk = new FlxButton(29, 380, "", closeOptions);
-		optionsOk.loadGraphic('assets/images/menu/mainmenu/options_backtogamebutton_full.png', true, 360, 100);
-		optionsBG = AngelUtils.fromAlphaMask('assets/images/menu/options_menuback.jpg', 'assets/images/menu/options_menuback_.png', 0, 0);
-		trace('Options Menu Shit loaded');
 		FlxG.sound.play('assets/sounds/roll_in.ogg');
 		background = new FlxSprite();
 		background.makeGraphic(800, 600, FlxColor.WHITE);
 
-		DiscordRpc.start({
-			clientID: "884169727415566417",
-			onReady: onReady,
-			onError: onError,
-			onDisconnected: onDisconnected
-		});
-		DiscordRpc.presence({
-			details: 'Version: [PRIVATE BETA 2]',
-			state: 'In the Main Menu.',
-			largeImageKey: 'discord_rpc_512',
-			largeImageText: 'Plants VS Zombies: Haxe Edition'
-		});
+		#if windows
+		DiscordRPC.changePressence('In the Main Menu.');
+		#end
 
-		// Plays the Main Menu Theme (Dave Intro) \\
-		// FlxG.sound.playMusic('assets/music/main_menu_theme.ogg');
 
 		// Background Shit \\
 		sky = new FlxSprite().loadGraphic('assets/images/menu/mainmenu/SelectorScreen_BG.jpg');
@@ -150,7 +106,24 @@ class MainMenuState extends FlxState
 		trace("Doing shit?");
 	}
 
+	override function closeSubState()
+	{
+		super.closeSubState();
+		if (minigame != null)
+			minigame.active = true;
+		if (adventure != null)
+			adventure.active = true;
+		if (quit != null)
+			quit.active = true;
+		if (help != null)
+			help.active = true;
+		if (options != null)
+			options.active = true;
+		persistentUpdate = true;
+	}
+
 	var nameTitle:FlxText;
+
 	var nameSubTitle:FlxText;
 	var nameInput:FlxUIInputText;
 	var nameSubmit:FlxButton;
@@ -159,7 +132,7 @@ class MainMenuState extends FlxState
 	{
 		trace('Animation not finished.');
 
-		if (_gamedata.data.name == null)
+		if (GameSave.playerName == null)
 		{
 			nameTitle = new FlxText(337.5, 241);
 			nameTitle.setFormat('assets/fonts/DWARVESC.ttf', 24, 0xFFF5C8, CENTER);
@@ -190,18 +163,17 @@ class MainMenuState extends FlxState
 
 	function submitName()
 	{
-		_gamedata.data.name = nameInput.text;
+		GameSave.playerName = nameInput.text;
 		nameInput.maxLength = 13;
-		woodUsrName.text = _gamedata.data.name + '!';
-		trace('Set name to ' + _gamedata.data.name);
+		woodUsrName.text = GameSave.playerName + '!';
+
+		trace('Set name to ' + GameSave.playerName);
 
 		// Remove the UI
 		remove(nameTitle);
 		remove(nameSubTitle);
 		remove(nameInput);
 		remove(nameSubmit);
-
-		_gamedata.flush(); // Save the name
 	}
 
 	function getButtons()
@@ -210,23 +182,7 @@ class MainMenuState extends FlxState
 		// Adventure Button \\
 		adventure = new FlxButton(405, 65, "", openAdventure);
 		// game data \\
-		trace("[SYSTEM] trying to load game save data...");
-		if (_gamedata.data.newgame == null)
-		{
-			trace("[GAME DATA] Failed!");
-
-			_gamedata.data.newgame = true;
-			_gamedata.data.world = 1;
-			_gamedata.data.level = 1;
-			_gamedata.data.minigames = false;
-			_gamedata.data.survival = false;
-			_gamedata.data.fastpool = false;
-			_gamedata.data.name = null; // Player has no name, we have to get it whenever the prompt appears
-
-			_gamedata.flush();
-			trace("[GAME DATA] Reset back to default.");
-		}
-		if (_gamedata.data.newgame == true)
+		if (GameSave.isNewGame)
 		{
 			adventure.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_StartAdventure_Button1.png', true, 331, 146);
 			adventure_shadow = new FlxSprite().loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Shadow_StartAdventure.png');
@@ -247,10 +203,8 @@ class MainMenuState extends FlxState
 		minigame.x = 406;
 		minigame_shadow.x = 407;
 		minigame_shadow.y = 177;
-		if (_gamedata.data.minigames == false)
-		{
+		if (!GameSave.minigamesUnlocked)
 			minigame.color = 0xFF808080;
-		}
 		trace('[SYSTEM] Mini-Games button');
 
 		// Almanac Button \\
@@ -284,7 +238,7 @@ class MainMenuState extends FlxState
 	{
 		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
 		fuckYouStop();
-		if (_gamedata.data.newgame == true)
+		if (GameSave.isNewGame)
 		{
 			trace("[SYSTEM] New Adventure");
 			game.LawnConfig.curLevel = "1-1";
@@ -312,7 +266,7 @@ class MainMenuState extends FlxState
 	function openMinigames()
 	{
 		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
-		if (_gamedata.data.minigames == true)
+		if (GameSave.minigamesUnlocked)
 		{
 			trace("[SYSTEM] MiniGame Unlocked");
 			FlxG.switchState(new MinigameState());
@@ -341,37 +295,11 @@ class MainMenuState extends FlxState
 
 	function optionsShit()
 	{
-		FlxG.sound.play('assets/sounds/tap.ogg'); // button sound
-		// optionsBG.loadGraphic('assets/images/menu/options_menuback.jpg'); // bg :c
-		trace('[OPTIONS MENU] Is the options Menu Open? ' + optionsOpen);
-		if (optionsOpen == false)
-		{
-			creatingMenu = true;
-			optionsOpen = true;
-			fuckYouStop();
-			optionsMenu.add(optionsBG);
-			optionsMenu.add(optionsOk);
-			add(optionsMenu);
-			optionsMenu.screenCenter();
-			new FlxTimer().start(0.1, (tmr:FlxTimer) ->
-			{
-				creatingMenu = false;
-			});
-		}
-	}
-
-	function closeOptions()
-	{
-		optionsOpen = false;
-		minigame.active = true;
-		adventure.active = true;
-		quit.active = true;
-		help.active = true;
-		options.active = true;
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
-		optionsMenu.x = 0;
-		optionsMenu.y = 0;
-		remove(optionsMenu);
+		FlxG.sound.play('assets/sounds/tap.ogg');
+		fuckYouStop();
+		persistentUpdate = false;
+		persistentDraw = true;
+		openSubState(new game.menus.substate.OptionsSubstate());
 	}
 
 	function helpShit()
@@ -380,7 +308,7 @@ class MainMenuState extends FlxState
 		FlxG.sound.music.stop();
 		new FlxTimer().start(0.2, (tmr:FlxTimer) ->
 		{
-			FlxG.switchState(new HelpState());
+			FlxG.switchState(new game.menus.options.HelpState());
 		});
 	}
 
@@ -391,102 +319,19 @@ class MainMenuState extends FlxState
 		lime.system.System.exit(0);
 	}
 
-	// thanks Angel // Angel: no problem bud
-	var draggingMenu:Bool = false;
-	var creatingMenu:Bool = false;
-	var menuPrevX:Float;
-	var menuPrevY:Float;
-	var cursorPrevX:Int;
-	var cursorPrevY:Int;
-
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		#if windows
 		// keep it running when it's alive and kill it when it's not?????? \\
-		DiscordRpc.process();
+		DiscordRPC.process();
 		if (false)
 		{
-			DiscordRpc.shutdown();
+			DiscordRPC.shutdown();
 		}
-		// thanks Angel // Angel: no problem my dude
-		if (FlxG.mouse.justPressed)
-		{
-			if (optionsOpen && !creatingMenu)
-			{
-				// optionsBG < click
-				// optionsMenu < move
+		#end
 
-				var inButtonArea:Bool = false;
-				var x1, x2, y1, y2;
-				x1 = optionsOk.getScreenPosition().x;
-				x2 = optionsOk.getScreenPosition().x + optionsOk.width;
-				y1 = optionsOk.getScreenPosition().y;
-				y2 = optionsOk.getScreenPosition().y + optionsOk.height;
-				if (FlxG.mouse.screenX >= x1 && FlxG.mouse.screenX <= x2 && FlxG.mouse.screenY >= y1 && FlxG.mouse.screenY <= y2)
-					inButtonArea = true;
-
-				if (!inButtonArea)
-				{
-					x1 = optionsBG.getScreenPosition().x;
-					x2 = optionsBG.getScreenPosition().x + optionsBG.width;
-					y1 = optionsBG.getScreenPosition().y;
-					y2 = optionsBG.getScreenPosition().y + optionsBG.height;
-					if (FlxG.mouse.screenX >= x1 && FlxG.mouse.screenX <= x2 && FlxG.mouse.screenY >= y1 && FlxG.mouse.screenY <= y2)
-					{
-						draggingMenu = true;
-						menuPrevX = optionsMenu.x;
-						menuPrevY = optionsMenu.y;
-						cursorPrevX = FlxG.mouse.screenX;
-						cursorPrevY = FlxG.mouse.screenY;
-					}
-				}
-			}
-		}
-
-		if (FlxG.mouse.justReleased)
-		{
-			if (draggingMenu)
-				draggingMenu = false;
-
-			menuPrevX = 0;
-			menuPrevY = 0;
-			cursorPrevX = 0;
-			cursorPrevY = 0;
-		}
-
-		if (FlxG.mouse.pressed)
-		{
-			// var offscreen:Bool = (FlxG.mouse.screenX < 0 || FlxG.mouse.screenX > FlxG.width || FlxG.mouse.screenY < 0 || FlxG.mouse.screenY > FlxG.height);
-			if (draggingMenu /* && !offscreen */)
-			{
-				// var offsetX = FlxG.mouse.screenX - cursorPrevX;
-				// var offsetY = FlxG.mouse.screenY - cursorPrevY;
-				// Angel: ditched the variables since they take up more memory, especially if this runs every frame of the game
-
-				optionsMenu.x = menuPrevX + (FlxG.mouse.screenX - cursorPrevX);
-				optionsMenu.y = menuPrevY + (FlxG.mouse.screenY - cursorPrevY);
-				AngelUtils.bounceToFrame(optionsMenu); // Angel: don't even say it Cheese, you're welcome
-			}
-		}
-		// now back to me lol
-		// Debug \\
 		#if debug
-		// if (FlxG.keys.justReleased.D)
-		// {
-		// 	remove(backdrop);
-		// 	remove(background);
-		// 	remove(sky);
-		// 	remove(tree);
-		// 	remove(selectMenu);
-		// }
-		// if (FlxG.keys.justReleased.A)
-		// {
-		// 	add(backdrop);
-		// 	add(background);
-		// 	add(sky);
-		// 	add(tree);
-		// 	add(selectMenu);
-		// }
 		DebugUtils.debug(nameTitle);
 		DebugUtils.debug(nameSubTitle);
 		if (FlxG.keys.pressed.R && FlxG.keys.pressed.CONTROL) // refresh lol
@@ -494,42 +339,5 @@ class MainMenuState extends FlxState
 			FlxG.resetGame();
 		}
 		#end
-	}
-
-	// Audio Pausing \\
-	override public function onFocusLost()
-	{
-		super.onFocusLost();
-		FlxG.sound.music.pause();
-		trace("[SYSTEM] User Lost Focus the window");
-	}
-
-	override public function onFocus()
-	{
-		super.onFocus();
-		FlxG.sound.music.resume();
-		trace("[SYSTEM] User Focused the window");
-	}
-
-	// I just stole the fuckin' code from the github lol \\
-	static function onReady()
-	{
-		// Updating Discord Rich Presence
-		DiscordRpc.presence({
-			details: 'Version: [PRIVATE BETA 2]',
-			state: 'In the Main Menu.',
-			largeImageKey: 'discord_rpc_512',
-			largeImageText: 'Plants VS Zombies: Haxe Edition'
-		});
-	}
-
-	static function onError(_code:Int, _message:String)
-	{
-		trace('[DISCORD RPC] Error! $_code : $_message');
-	}
-
-	static function onDisconnected(_code:Int, _message:String)
-	{
-		trace('[DISCORD RPC] Disconnected! $_code : $_message');
 	}
 }
