@@ -4,12 +4,14 @@ import core.json.LevelData;
 import core.api.DiscordRPC;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxSprite;
+import core.audio.DynamicGameMusic;
 import flixel.State;
 import game.objects.Zombie;
 import game.objects.Plant;
 import game.objects.Lawn;
 import game.controllers.HUD;
-import core.audio.DynamicGameMusic;
+import game.objects.Sun;
+import game.controllers.SunController;
 import core.sprites.AnimationHandler;
 
 class LawnState extends State
@@ -42,6 +44,9 @@ class LawnState extends State
 	public var hud:HUD;
 	public var music:DynamicGameMusic;
 
+	var sunController:SunController;
+	var sunGroup:flixel.group.FlxGroup;
+
 	public var paused:Bool = false;
 
 	var tileOffX:Float = 0;
@@ -59,9 +64,9 @@ class LawnState extends State
 
 		// Load Plant Animations
 		for (plant in Plant.plantIDs)
-			AnimationHandler.parseAnimation('data/plants', plant);
+			AnimationHandler.parseAnimation('plants', plant);
 
-		background = new Lawn();
+		background = new Lawn(0, 0, levelData.lawnJson.lawn);
 		camGame.zoom = background.defaultZoom;
 		add(background);
 
@@ -109,6 +114,12 @@ class LawnState extends State
 
 		hud = new HUD();
 		hud.cameras = [camHUD];
+
+		sunGroup = new flixel.group.FlxGroup();
+		add(sunGroup);
+
+		sunController = new SunController(levelData.lawnJson, sunGroup, hud);
+
 		add(hud);
 		hud.initFromLevel(levelData.lawnJson);
 
@@ -194,6 +205,8 @@ class LawnState extends State
 			if (FlxG.sound.music != null)
 				FlxG.sound.music.pause();
 
+			sunController?.setPaused(paused);
+
 			FlxG.sound.play(Paths.sound('pause'));
 
 			persistentUpdate = false;
@@ -209,29 +222,20 @@ class LawnState extends State
 		trace('level Type is ' + levelType);
 		switch (levelType)
 		{
-			case 'grass_dirt':
-				DiscordRPC.changePressence('Waiting for User Input...');
-				background.reloadImage('assets/images/levels/grassday/grassday_dirt.png');
-				music.audioGame(1, 'grasswalk');
-			case 'grass':
-				DiscordRPC.changePressence('Waiting for User Input...');
-				background.reloadImage('assets/images/levels/grassday/grassday.png');
-				music.audioGame(1, 'grasswalk');
-
 			case 'night':
 				DiscordRPC.changePressence('Waiting for User Input...');
-				background.reloadImage('assets/images/levels/grassnight/grassnight.jpg');
+				background.reloadImage(Paths.gameplayImage('levels/grassnight/grassnight'));
 				music.audioGame(2, 'moongrains');
 			case 'pool':
 				DiscordRPC.changePressence('Waiting for User Input...');
-				background.reloadImage('assets/images/levels/poolday/poolday.jpg');
+				background.reloadImage(Paths.gameplayImage('levels/poolday/poolday'));
 				if (GameSave.fastPool)
 					music.audioGame(3, 'watery_graves_fast');
 				else
 					music.audioGame(3, 'watery_graves');
 			case 'night_pool':
 				DiscordRPC.changePressence('Waiting for User Input...');
-				background.reloadImage('assets/images/levels/poolnight/poolnight.jpg');
+				background.reloadImage(Paths.gameplayImage('levels/poolnight/poolnight'));
 				music.audioGame(4, 'rigor_moris');
 			case 'roof':
 				DiscordRPC.changePressence('Playing Adventure', 'Version: [PRIVATE BETA 2]', 'discord_rpc_512', 'Plants VS Zombies: Haxe Edition',
@@ -239,13 +243,35 @@ class LawnState extends State
 					+ GameSave.world
 					+ '-'
 					+ GameSave.level);
-				background.reloadImage('assets/images/levels/roofday/roofday.jpg');
+				background.reloadImage(Paths.gameplayImage('levels/roofday/roofday'));
 				music.audioGame(5, 'graze_the_roof');
 			case 'roof_night':
 				DiscordRPC.changePressence('Playing the final Adventure Level!', 'Version: [PRIVATE BETA 2]', 'discord_rpc_512',
 					'Plants VS Zombies: Haxe Edition', 'discord_rpc_512_boss', 'holy shit they are about to beat the game, partly');
-				background.reloadImage('assets/images/levels/roofnight/roofnight.jpg');
+				background.reloadImage(Paths.gameplayImage('levels/roofnight/roofnight'));
 				music.audioGame(5, 'brainiac_maniac');
+			default:
+				DiscordRPC.changePressence('Waiting for User Input...');
+				getMusic();
+		}
+	}
+
+	function getMusic()
+	{
+		if (levelData != null && levelData.lawnJson != null)
+		{
+			if (levelData.lawnJson.world != null && levelData.lawnJson.music != null)
+			{
+				music.audioGame(levelData.lawnJson.world, levelData.lawnJson.music);
+			}
+			else
+			{
+				trace('WARNING: Music data is missing from the JSON (World: ${levelData.lawnJson.world}, Music: ${levelData.lawnJson.music})');
+			}
+		}
+		else
+		{
+			trace("WARNING: The music could not be played. 'music', 'levelData' o 'lawnJson' is null.");
 		}
 	}
 
@@ -327,6 +353,9 @@ class LawnState extends State
 	{
 		zombieList = null;
 		plantList = null;
+
+		sunController?.destroy();
+		sunController = null;
 
 		super.destroy();
 	}

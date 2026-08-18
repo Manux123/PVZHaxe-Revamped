@@ -1,0 +1,22 @@
+{
+    "path": "grassday/grassday",
+    "defaultZoom": 0.8,
+    "rows": 9,
+    "cols": 5,
+    "camPos": [
+        -100,
+        0
+    ],
+    "position": [
+        -220,
+        -80
+    ],
+    "positionTile": [
+        0,
+        40
+    ],
+    "scale": [
+        0.5,
+        0.5
+    ]
+}

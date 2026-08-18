@@ -50,7 +50,7 @@ class MainLoadState extends State
 		DiscordRPC.init();
 		#end
 		// Plays the Main Menu Theme (Dave Intro) \\
-		FlxG.sound.playMusic(Paths.music("main_menu_theme"));
+		FlxG.sound.playMusic(Paths.menuMusic("main_menu_theme"));
 		FlxAssets.FONT_DEFAULT = 'assets/fonts/Brianne_s_hand.ttf';
 		popcap = new FlxText(260, 38, 339, 'Plants VS Zombies made by:', 24);
 		popcap.alpha = 0;
@@ -62,7 +62,7 @@ class MainLoadState extends State
 		eGunner = new FlxText(237, 425, 433, 'Haxe Engine made by: Electr0Gunner', 24);
 		eGunner.alpha = 0;
 
-		popcap_logo = new FlxSprite(250, 65).loadGraphic('assets/images/menu/loading/PopCap_Logo.jpg');
+		popcap_logo = new FlxSprite(250, 65).loadGraphic(Paths.menuImage('loading/PopCap_Logo'));
 		popcap_logo.alpha = 0;
 
 		add(popcap);
@@ -136,12 +136,12 @@ class MainLoadState extends State
 			continueBttn = new FlxButton(319, 553, "", continuefunc);
 
 			// Load the start button image \\
-			continueBttn.loadGraphic('assets/images/menu/loading/strtbttn.png', true, 165, 12);
+			continueBttn.loadGraphic(Paths.menuImage('loading/strtbttn'), true, 165, 12);
 			// add background \\
 			var background:FlxSprite;
-			background = new FlxSprite().loadGraphic('assets/images/menu/loading/titlescreen.jpg');
+			background = new FlxSprite().loadGraphic(Paths.menuImage('loading/titlescreen'));
 			// PvZ Logo \\
-			pvz_logo = AngelUtils.fromAlphaMask('assets/images/menu/loading/PvZ_Logo.jpg', 'assets/images/menu/loading/PvZ_Logo_.png', 51, 10);
+			pvz_logo = AngelUtils.fromAlphaMask(Paths.menuImage('loading/PvZ_Logo'), Paths.menuImage('loading/PvZ_Logo_'), 51, 10);
 			add(background);
 			add(pvz_logo);
 			// Haxe Edition Text \\
@@ -151,9 +151,9 @@ class MainLoadState extends State
 			add(haxe_edition);
 			// Loading Bar \\
 
-			bar_dirt = new FlxSprite(244, 535).loadGraphic('assets/images/menu/loading/LoadBar_dirt.png');
-			bar_grass = new FlxSprite(243, 520).loadGraphic('assets/images/menu/loading/LoadBar_grass.png');
-			grass_ball = new FlxSprite(231, 484).loadGraphic('assets/images/menu/loading/SodRollCap.png');
+			bar_dirt = new FlxSprite(244, 535).loadGraphic(Paths.menuImage('loading/LoadBar_dirt'));
+			bar_grass = new FlxSprite(243, 520).loadGraphic(Paths.menuImage('loading/LoadBar_grass'));
+			grass_ball = new FlxSprite(231, 484).loadGraphic(Paths.menuImage('loading/SodRollCap'));
 			add(bar_dirt);
 			add(bar_grass);
 			add(grass_ball);
@@ -186,41 +186,41 @@ class MainLoadState extends State
 			var id = plant;
 			loadQueue.push(() ->
 			{
-				AnimationHandler.parseAnimation('data/plants', id);
+				AnimationHandler.parseAnimation('plants', id);
 			});
 		}
 
 		// HUD
 		loadQueue.push(() ->
 		{
-			openfl.Assets.cache.getBitmapData(Paths.image('ui/SeedBank'));
+			openfl.Assets.cache.getBitmapData(Paths.gameplayImage('ui/SeedBank'));
 		});
 
 		var menuImages = [
-			'assets/images/menu/mainmenu/ScreenSelector_WoodSign_Button.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Adventure_Button.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Adventure_button.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Almanac.png',
-			'assets/images/menu/mainmenu/SelectorScreen_BG.jpg',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Center.jpg',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Center_.png',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Left.jpg',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Left_.png',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Right.jpg',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Right_.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Help.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Options.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Quit.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Shadow_Adventure.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Shadow_StartAdventure.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Shadow_Survival.png',
-			'assets/images/menu/mainmenu/SelectorScreen_StartAdventure_Button1.png',
-			'assets/images/menu/mainmenu/SelectorScreen_Survival_button.png',
-			'assets/images/menu/mainmenu/SelectorScreen_WoodSign1.png',
-			'assets/images/menu/mainmenu/SelectorScreen_WoodSign3.png',
-			'assets/images/menu/mainmenu/options_backtogamebutton_full.png',
-			'assets/images/menu/options_menuback.jpg',
-			'assets/images/menu/options_menuback_.png',
+			'assets/menus/images/mainmenu/ScreenSelector_WoodSign_Button.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Adventure_Button.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Adventure_button.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Almanac.png',
+			'assets/menus/images/mainmenu/SelectorScreen_BG.png',
+			'assets/menus/images/mainmenu/SelectorScreen_BG_Center.png',
+			'assets/menus/images/mainmenu/SelectorScreen_BG_Center_.png',
+			'assets/menus/images/mainmenu/SelectorScreen_BG_Left.png',
+			'assets/menus/images/mainmenu/SelectorScreen_BG_Left_.png',
+			'assets/menus/images/mainmenu/SelectorScreen_BG_Right.png',
+			'assets/menus/images/mainmenu/SelectorScreen_BG_Right_.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Help.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Options.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Quit.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Shadow_Adventure.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Shadow_StartAdventure.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Shadow_Survival.png',
+			'assets/menus/images/mainmenu/SelectorScreen_StartAdventure_Button1.png',
+			'assets/menus/images/mainmenu/SelectorScreen_Survival_button.png',
+			'assets/menus/images/mainmenu/SelectorScreen_WoodSign1.png',
+			'assets/menus/images/mainmenu/SelectorScreen_WoodSign3.png',
+			'assets/menus/images/mainmenu/options_backtogamebutton_full.png',
+			'assets/menus/images/general/options/options_menuback.png',
+			'assets/menus/images/general/options/options_menuback_.png',
 		];
 		for (path in menuImages)
 		{

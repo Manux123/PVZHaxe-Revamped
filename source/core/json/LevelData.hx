@@ -90,7 +90,7 @@ class LevelData
 
 	public function loadLevel()
 	{
-		lawnJson = cast AngelUtils.JsonifyFile(Paths.json('levels/${game.LawnConfig.curLevel}'));
+		lawnJson = cast AngelUtils.JsonifyFile(Paths.gameplayJson('levels/${game.LawnConfig.curLevel}'));
 
 		if (lawnJson == null || lawnJson.lawn == null)
 		{

@@ -1,18 +1,34 @@
 package game.objects;
 
 import flixel.FlxSprite;
+import haxe.Json;
+import openfl.Assets;
 
-class Projectile extends FlxSprite{
-    public function new(x:Float, y:Float, type:String = "pea"){
-        super(x,y);
-        var projectileSprite = new FlxSprite(x,y).loadGraphic('assets/images/projectiles/$type.png');
-    }
+typedef ProjectileJson =
+{
+	var path:String;
+	var speed:Float;
+	var health:Int;
+}
 
-    override function update(elapsed:Float){
-        this.velocity.x = 100;
+class Projectile extends FlxSprite
+{
+	public var jsonData:ProjectileJson;
+	public var damage:Int;
 
-        //if (this.overlaps) leaving this for the zombies
-        super.update(elapsed);
-    }
+	public function new(x:Float, y:Float, type:String = "pea")
+	{
+		super(x, y);
 
+		jsonData = Json.parse(Assets.getText(Paths.gameplayJson('projectiles/$type')));
+		loadGraphic(Paths.gameplayImage('projectiles/${jsonData.path}'));
+		damage = jsonData.health;
+	}
+
+	override function update(elapsed:Float)
+	{
+		velocity.x = jsonData.speed;
+
+		super.update(elapsed);
+	}
 }

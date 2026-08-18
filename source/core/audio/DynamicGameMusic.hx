@@ -11,6 +11,6 @@ class DynamicGameMusic
 
 	public function audioGame(world:Int = 1, music:String)
 	{
-		FlxG.sound.playMusic(Paths.music('gameplay/world' + world + '/' + music));
+		FlxG.sound.playMusic(Paths.gameplayMusic('world' + world + '/' + music));
 	}
 }

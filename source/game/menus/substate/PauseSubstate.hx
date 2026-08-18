@@ -22,13 +22,13 @@ class PauseSubstate extends flixel.Substate
 		destroySubStates = false;
 		this.camera = FlxG.cameras.list[FlxG.cameras.list.length - 1];
 
-		optionsBG = AngelUtils.fromAlphaMask('assets/images/menu/options_menuback.jpg', 'assets/images/menu/options_menuback_.png', 0, 0);
+		optionsBG = AngelUtils.fromAlphaMask(Paths.menuImage('general/options/options_menuback'), Paths.menuImage('general/options/options_menuback_'), 0, 0);
 
 		optionsOk = new FlxButton(0, 0, "", closeOptions);
-		optionsOk.loadGraphic('assets/images/menu/mainmenu/options_backtogamebutton_full.png', true, 360, 100);
+		optionsOk.loadGraphic(Paths.menuImage('general/options/options_backtogamebutton_full'), true, 360, 100);
 
 		backTo = new FlxButton(0, 0, "", backToMenu);
-		backTo.loadGraphic('assets/images/menu/mainmenu/options_backtogamebutton_full.png', true, 360, 100);
+		backTo.loadGraphic(Paths.menuImage('general/options/options_backtogamebutton_full'), true, 360, 100);
 		backTo.scale.set(0.6, 0.6);
 		backTo.updateHitbox();
 

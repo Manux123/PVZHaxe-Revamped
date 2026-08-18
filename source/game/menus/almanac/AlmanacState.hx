@@ -20,7 +20,7 @@ class AlmanacState extends State
 
 	override public function create()
 	{
-		background = new FlxSprite(0, 0).loadGraphic("assets/images/menu/almanac/Almanac_IndexBack.png");
+		background = new FlxSprite(0, 0).loadGraphic(Paths.menuImage("almanac/Almanac_IndexBack"));
 		add(background);
 
 		titleTxt = new FlxText(305, 20, 356, 'Suburban Almanac - Index', 36);
@@ -32,7 +32,7 @@ class AlmanacState extends State
 		add(titleTxt);
 
 		exitButton = new FlxButton(700, FlxG.height - 35, "", exitAlmanac);
-		exitButton.loadGraphic('assets/images/menu/almanac/Almanac_CloseButton.png', true, 89, 26);
+		exitButton.loadGraphic(Paths.menuImage('almanac/Almanac_CloseButton'), true, 89, 26);
 		add(exitButton);
 
 		exitText = new FlxText(exitButton.x + 10, exitButton.y + 4);
@@ -42,7 +42,7 @@ class AlmanacState extends State
 		add(exitText);
 
 		plantButton = new FlxButton(130, FlxG.height - 245, "", enterPlant);
-		plantButton.loadGraphic('assets/images/menu/almanac/viewplant.png', true, 156, 42);
+		plantButton.loadGraphic(Paths.menuImage('almanac/viewplant'), true, 156, 42);
 		add(plantButton);
 	}
 

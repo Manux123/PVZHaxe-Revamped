@@ -1,0 +1,26 @@
+{
+  "textureName": "peashooter",
+  "health": 100,
+  "cost": 100,
+  "isSpecial": false,
+  "flipX": false,
+  "flipY": false,
+  "anims": [
+    {
+      "x": 0,
+      "y": 0,
+      "postfix": "peashooter shoot",
+      "prefix": "shoot",
+      "fps": 24,
+      "looped": false
+    },
+    {
+      "x": -29,
+      "y": 27,
+      "postfix": "peashooter idle",
+      "prefix": "idle",
+      "fps": 24,
+      "looped": true
+    }
+  ]
+}

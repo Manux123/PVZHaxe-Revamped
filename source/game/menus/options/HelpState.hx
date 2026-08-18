@@ -29,11 +29,11 @@ class HelpState extends State
 		DiscordRPC.changePressence('Reading Help.');
 
 		button = new FlxButton(325, 521, '', goBack);
-		button.loadGraphic('assets/images/notes/help_Button.png', true, 156, 42);
-		bg = new FlxSprite().loadGraphic('assets/images/levels/grassday/grassday.png');
-		paper = AngelUtils.fromAlphaMask('assets/images/notes/ZombieNote.jpg', 'assets/images/notes/ZombieNote_.png', 80, 79.5);
-		text = new FlxSprite(130.5, 131.5).loadGraphic('assets/images/notes/text/ZombieNoteHelp.png');
-		fade = new FlxSprite().loadGraphic('assets/images/notes/text/ZombieNoteHelpBlack.png');
+		button.loadGraphic(Paths.menuImage('notes/help_Button'), true, 156, 42);
+		bg = new FlxSprite().loadGraphic(Paths.gameplayImage('levels/grassday/grassday'));
+		paper = AngelUtils.fromAlphaMask(Paths.menuImage('notes/ZombieNote'), Paths.menuImage('notes/ZombieNote_'), 80, 79.5);
+		text = new FlxSprite(130.5, 131.5).loadGraphic(Paths.menuImage('notes/text/ZombieNoteHelp'));
+		fade = new FlxSprite().loadGraphic(Paths.menuImage('notes/text/ZombieNoteHelpBlack'));
 
 		FlxG.sound.play('assets/sounds/paper.ogg');
 

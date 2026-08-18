@@ -7,6 +7,7 @@ import openfl.utils.Assets;
 
 typedef LawnData =
 {
+	var path:String;
 	var ?defaultZoom:Float;
 	var ?cols:Int;
 	var ?rows:Int;
@@ -38,7 +39,7 @@ class Lawn extends FlxSpriteGroup
 	{
 		super(x, y);
 
-		lawnJson = Json.parse(Assets.getText('assets/data/lawns/${backgroundType}.json'));
+		lawnJson = Json.parse(Assets.getText(Paths.gameplayJson('lawns/${backgroundType}')));
 
 		if (lawnJson == null)
 		{
@@ -55,7 +56,7 @@ class Lawn extends FlxSpriteGroup
 
 		tileData = [for (i in 0...rows) [for (j in 0...column) new Tile()]];
 		lawnSprite = new FlxSprite();
-		lawnSprite.loadGraphic(Paths.image('levels/${backgroundType}/${backgroundType}'));
+		lawnSprite.loadGraphic(Paths.gameplayImage('levels/${lawnJson.path}'));
 		lawnSprite.active = false;
 		lawnSprite.x += lawnJson.position[0];
 		lawnSprite.y += lawnJson.position[1];

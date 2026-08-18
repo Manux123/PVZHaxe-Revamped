@@ -16,7 +16,7 @@ class SeedPacket extends FlxSpriteGroup
 		super(x, y);
 		characterString = character;
 		spritePacket = new FlxSprite(x, y);
-		spritePacket.loadGraphic(Paths.image("ui/seedPackets/" + character));
+		spritePacket.loadGraphic(Paths.gameplayImage("ui/seedPackets/" + character));
 		spritePacket.antialiasing = true;
 		add(spritePacket);
 		if (notRecommended)

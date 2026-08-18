@@ -47,12 +47,13 @@ class MinigameState extends State
 	{
 		super.create();
 
-		for (file in sys.FileSystem.readDirectory("assets/data/minigames"))
+		for (file in sys.FileSystem.readDirectory("assets/menus/data/minigames"))
 		{
 			if (file.endsWith('.json'))
 				pageCount++;
 		}
-		background = new FlxSprite(0, 0).loadGraphic("assets/images/menu/minigames/Challenge_Background.png");
+
+		background = new FlxSprite(0, 0).loadGraphic(Paths.menuImage("minigames/Challenge_Background"));
 		add(background);
 
 		titleTxt = new FlxText(305, 20, 216, 'Minigames', 36);
@@ -67,7 +68,7 @@ class MinigameState extends State
 		add(windowGroup);
 
 		exitButton = new FlxButton(10, FlxG.height - 35, "", exitMinigames);
-		exitButton.loadGraphic('assets/images/ui/SeedChooser_Button2.png', true, 111, 26);
+		exitButton.loadGraphic(Paths.menuImage('SeedChooser_Button2'), true, 111, 26);
 		add(exitButton);
 
 		exitText = new FlxText(exitButton.x + 15, exitButton.y + 5);
@@ -77,7 +78,7 @@ class MinigameState extends State
 		add(exitText);
 
 		pageLeftButton = new FlxButton(140, FlxG.height - 35, "", movePageLeft);
-		pageLeftButton.loadGraphic('assets/images/ui/SeedChooser_Button2.png', true, 111, 26);
+		pageLeftButton.loadGraphic(Paths.menuImage('SeedChooser_Button2'), true, 111, 26);
 		add(pageLeftButton);
 
 		pageLeftText = new FlxText(pageLeftButton.x + 15, pageLeftButton.y + 5);
@@ -87,7 +88,7 @@ class MinigameState extends State
 		add(pageLeftText);
 
 		pageRightButton = new FlxButton(600, FlxG.height - 35, "", movePageRight);
-		pageRightButton.loadGraphic('assets/images/ui/SeedChooser_Button2.png', true, 111, 26);
+		pageRightButton.loadGraphic(Paths.menuImage('SeedChooser_Button2'), true, 111, 26);
 		add(pageRightButton);
 
 		pageRightText = new FlxText(pageRightButton.x + 15, pageRightButton.y + 5);
@@ -107,7 +108,7 @@ class MinigameState extends State
 
 	private function changePage(pageInt:Int = 0)
 	{
-		minigameJson = AngelUtils.JsonifyFile('assets/data/minigames/page${curPage}.json');
+		minigameJson = AngelUtils.JsonifyFile(Paths.menuJson('minigames/page${curPage}'));
 		windowGroup.forEach(w -> w.destroy());
 		windowGroup.clear();
 
@@ -184,14 +185,14 @@ class ChallengeWindow extends FlxSpriteGroup
 		whatMinigame = goToLevel;
 		minigameDisplay = minigame;
 		lockedGame = isLocked;
-		window = new FlxSprite(x, y).loadGraphic("assets/images/menu/minigames/Challenge_Window.png");
+		window = new FlxSprite(x, y).loadGraphic(Paths.menuImage("minigames/Challenge_Window"));
 
-		portrait = new FlxSprite(window.x + 20, window.y + 8).loadGraphic('assets/images/menu/minigames/portraits/${goToLevel}.png');
+		portrait = new FlxSprite(window.x + 20, window.y + 8).loadGraphic(Paths.menuImage('minigames/portraits/${goToLevel}'));
 		add(portrait);
 
 		add(window);
 
-		lockSprite = new FlxSprite(x + 20, y).loadGraphic("assets/images/menu/minigames/lock.png");
+		lockSprite = new FlxSprite(x + 20, y).loadGraphic(Paths.menuImage("minigames/lock"));
 		lockSprite.scale.set(0.7, 0.7);
 		if (isLocked)
 			add(lockSprite);
@@ -225,12 +226,12 @@ class ChallengeWindow extends FlxSpriteGroup
 				_isHighlighted = hovering;
 				if (hovering)
 				{
-					window.loadGraphic("assets/images/menu/minigames/Challenge_Window_Highlight.png");
+					window.loadGraphic(Paths.menuImage("minigames/Challenge_Window_Highlight"));
 					minigameName.color = FlxColor.RED;
 				}
 				else
 				{
-					window.loadGraphic("assets/images/menu/minigames/Challenge_Window.png");
+					window.loadGraphic(Paths.menuImage("minigames/Challenge_Window"));
 					minigameName.color = MinigameState.buttonColor;
 				}
 			}

@@ -40,7 +40,7 @@ class PlantEntryPage extends State
 
 	override public function create()
 	{
-		background = new FlxSprite(0, 0).loadGraphic("assets/images/menu/almanac/Almanac_PlantBack.png");
+		background = new FlxSprite(0, 0).loadGraphic(Paths.menuImage("almanac/Almanac_PlantBack"));
 		add(background);
 
 		titleTxt = new FlxText(305, 15, 356, 'Suburban Almanac - Plants', 36);
@@ -52,7 +52,7 @@ class PlantEntryPage extends State
 		add(titleTxt);
 
 		exitButton = new FlxButton(700, FlxG.height - 35, "", exitAlmanac);
-		exitButton.loadGraphic('assets/images/menu/almanac/Almanac_CloseButton.png', true, 89, 26);
+		exitButton.loadGraphic(Paths.menuImage('almanac/Almanac_CloseButton'), true, 89, 26);
 		add(exitButton);
 
 		exitText = new FlxText(exitButton.x + 10, exitButton.y + 4);
@@ -63,7 +63,7 @@ class PlantEntryPage extends State
 		add(exitText);
 
 		indexButton = new FlxButton(10, FlxG.height - 35, "", goToIndex);
-		indexButton.loadGraphic('assets/images/menu/almanac/Almanac_IndexButton.png', true, 164, 26);
+		indexButton.loadGraphic(Paths.menuImage('almanac/Almanac_IndexButton'), true, 164, 26);
 		add(indexButton);
 
 		indexText = new FlxText(indexButton.x + 30, indexButton.y + 4);
@@ -101,14 +101,14 @@ class AlmanacEntry extends FlxSpriteGroup
 	{
 		super(x, y);
 		backgroundSprite = new FlxSprite(x, y);
-		backgroundSprite.loadGraphic("assets/images/menu/almanac/backgrounds/" + background + ".png");
+		backgroundSprite.loadGraphic(Paths.menuImage("almanac/backgrounds/" + background));
 		add(backgroundSprite);
 
 		plant = new Plant(x, y);
 		add(plant);
 
 		overlay = new FlxSprite(x, y);
-		overlay.loadGraphic("assets/images/menu/almanac/Almanac_PlantCard");
+		overlay.loadGraphic(Paths.menuImage("almanac/Almanac_PlantCard"));
 		overlay.alpha = 0.3;
 		add(overlay);
 	}

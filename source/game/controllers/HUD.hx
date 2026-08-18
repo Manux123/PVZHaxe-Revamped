@@ -52,17 +52,18 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 	public function createHUD()
 	{
-		seedBank = new FlxSprite(10, 5).loadGraphic(Paths.image("ui/SeedBank"));
+		seedBank = new FlxSprite(10, 5).loadGraphic(Paths.gameplayImage("ui/SeedBank"));
 		seedBank.scale.set(0.88, 0.88);
 		seedBank.updateHitbox();
 		add(seedBank);
 
-		sunText = new FlxText(seedBank.x + 29, seedBank.y + 50);
+		sunText = new FlxText(seedBank.x + 10, seedBank.y + 50, 40);
 		sunText.color = 0xFF000000;
-		sunText.font = 'assets/fonts/Brianne_s_hand.ttf';
+		sunText.font = Paths.font("Brianne_s_hand");
 		sunText.text = Std.string(game.LawnConfig.suns);
 		sunText.antialiasing = true;
 		sunText.size = 16;
+		sunText.alignment = FlxTextAlign.CENTER;
 		add(sunText);
 
 		var slotCount = seedPacketList.length;
@@ -78,7 +79,10 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 			var packetX:Float = seedBank.x + 5 + (i * spacing);
 			var packetY:Float = seedBank.y - 45;
 
-			var seedPacket = new SeedPacket(packetX, packetY, id, 100);
+			var plantData = core.sprites.AnimationHandler.animations[id];
+			var cost:Int = (plantData != null && plantData.data.cost != null) ? plantData.data.cost : 100;
+
+			var seedPacket = new SeedPacket(packetX, packetY, id, cost);
 			seedPacket.scale.set(0.46, 0.46);
 			seedPacket.updateHitbox();
 			add(seedPacket);
@@ -97,7 +101,8 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 		add(houseTxt);
 
 		menuButton = new flixel.ui.FlxButton(681, -12, '', onPausePressed);
-		menuButton.loadGraphic('assets/images/menu/inGamePause.png', true, 117, 48);
+		menuButton.loadGraphic(Paths.gameplayImage('ui/inGamePause'), true, 117, 48);
+		menuButton.updateHitbox();
 		add(menuButton);
 	}
 
@@ -126,7 +131,8 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 			pauseBitch();
 	}
 
-	override public function destroy() {
+	override public function destroy()
+	{
 		game.LawnConfig.suns = 0;
 	}
 }

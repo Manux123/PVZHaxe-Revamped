@@ -21,7 +21,7 @@ class Main extends Sprite
 			FlxG.autoPause = false;
 		});
 
-		FlxG.mouse.load(Paths.image('cursor'));
+		FlxG.mouse.load('assets/cursor.png');
 
 		WindowAPI.init();
 

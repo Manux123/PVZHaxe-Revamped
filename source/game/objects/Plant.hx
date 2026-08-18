@@ -15,6 +15,11 @@ class Plant extends flixel.FlxSprite
 	public var isAsleep:Bool;
 	public var isShooting:Bool;
 
+	public var cost(get, never):Int;
+
+	inline function get_cost():Int
+		return _handler.data.cost ?? 100;
+
 	var shadow:FlxSprite;
 
 	public function new(x:Float = 0, y:Float = 0, plantID:Int = 0, plantableType:PlantableType = DEFAULT, plantType:PlantType = ALL)
@@ -31,7 +36,7 @@ class Plant extends flixel.FlxSprite
 		updateHitbox();
 
 		shadow = new FlxSprite(0, 0);
-		shadow.loadGraphic(Paths.image('plants/plantshadow'));
+		shadow.loadGraphic(Paths.gameplayImage('plants/plantshadow'));
 	}
 
 	override function draw()

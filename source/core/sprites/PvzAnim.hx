@@ -11,7 +11,7 @@ class PvzAnim extends FlxSpriteGroup
 
 	public function new(path:String, limbs:Array<String>)
 	{
-		tex = Paths.getSparrowAtlas(path);
+		tex = Paths.gameplaySparrow(path);
 		frames = tex;
 		for (limbName in limbs)
 			createLimb(limbName)

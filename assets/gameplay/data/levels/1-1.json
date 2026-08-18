@@ -1,7 +1,8 @@
 {
     "name": "Level 1-1",
     "world": 1,
-    "lawn": "grassday",
+    "lawn": "grass_dirt",
+    "music": "grasswalk",
     "flags": 1,
     "startingSun": 0,
     "sunDropRate": 10.0,

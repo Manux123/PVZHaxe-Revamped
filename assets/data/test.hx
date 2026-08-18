@@ -1,2 +1,0 @@
-function createPreLawn()
-    trace("YOO");

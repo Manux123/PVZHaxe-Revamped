@@ -1,65 +1,96 @@
 package;
 
+import flixel.graphics.frames.FlxAtlasFrames;
 #if sys
 import sys.FileSystem;
+#else
+import openfl.Assets;
 #end
-import flixel.graphics.frames.FlxAtlasFrames;
 
+/**
+ * Folders Structure:
+ *   assets/
+ *     cursor.png
+ *     fonts/
+ *     sounds/
+ *     gameplay/
+ *       images/   (plants/, zombies/, projectiles/, levels/, ui/)
+ *       data/     (levels/, plants/, zombies/, projectiles/, lawns/)
+ *       music/    (world1/, world2/, ...)
+ *     menus/
+ *       images/   (mainmenu/, almanac/, general/, loading/, minigames/, notes/)
+ *       data/     (minigames/)
+ *       music/    (main_menu_theme.ogg, ...)
+ */
 class Paths
 {
-	public static function file(key:String, location:String, extension:String):String
+	private static inline function getPath(path:String):String
 	{
-		var data:String = 'assets/$location/$key.$extension';
-		return data;
+		#if sys
+		if (!FileSystem.exists(path))
+			trace('WARNING: File not found -> $path');
+		#else
+		if (!Assets.exists(path))
+			trace('WARNING: Asset not found -> $path');
+		#end
+
+		return path;
 	}
 
-	public static function image(key:String/* , forceLoadFromDisk:Bool = false */):Dynamic
+	private static function getSparrow(image:String, xml:String):FlxAtlasFrames
 	{
-		return file(key, 'images', 'png');
+		#if sys
+		if (!FileSystem.exists(image) || !FileSystem.exists(xml))
+			return null;
+		#else
+		if (!Assets.exists(image) || !Assets.exists(xml))
+			return null;
+		#end
+
+		return FlxAtlasFrames.fromSparrow(image, xml);
 	}
 
-	public static function xml(key:String, ?location:String = "images")
-	{
-		return file(key, location, "xml");
-	}
+	/** Any asset with an absolute path from assets/. */
+	public static inline function raw(path:String):String
+		return getPath('assets/$path');
 
-	public static function text(key:String, ?location:String = "data")
-	{
-		return file(key, location, "txt");
-	}
+	public static inline function font(key:String, ?ext:String = "ttf"):String
+		return getPath('assets/fonts/$key.$ext');
 
-	public static function json(key:String, ?location:String = "data")
-	{
-		return file(key, location, "json");
-	}
+	public static inline function sound(key:String):String
+		return getPath('assets/sounds/$key.ogg');
 
-	public static function sound(key:String)
-	{
-		return file(key, "sounds", 'ogg');
-	}
+	// gameplay
 
-	public static function music(key:String):Dynamic
-	{
-		return file(key, "music", 'ogg');
-	}
+	public static inline function gameplayImage(key:String):String
+		return getPath('assets/gameplay/images/$key.png');
 
-	public static function getSparrowAtlas(key:String)
-	{
-		return FlxAtlasFrames.fromSparrow(image(key), xml(key));
-	}
+	public static inline function gameplayXml(key:String):String
+		return getPath('assets/gameplay/images/$key.xml');
 
-	public static function getPackerAtlas(key:String)
-	{
-		return FlxAtlasFrames.fromSpriteSheetPacker(image(key), text(key, "images"));
-	}
+	public static inline function gameplayJson(key:String):String
+		return getPath('assets/gameplay/data/$key.json');
 
-	public static function video(key:String)
-	{
-		return file(key, "videos", "mp4");
-	}
+	public static inline function gameplayMusic(key:String):String
+		return getPath('assets/gameplay/music/$key.ogg');
 
-	public static function font(key:String, ?extension:String = "ttf")
-	{
-		return file(key, "fonts", extension);
-	}
+	public static inline function gameplaySparrow(key:String):FlxAtlasFrames
+		return getSparrow(gameplayImage(key), gameplayXml(key));
+
+	// menus
+
+	public static inline function menuImage(key:String):String
+		return getPath('assets/menus/images/$key.png');
+
+	public static inline function menuXml(key:String):String
+		return getPath('assets/menus/images/$key.xml');
+
+	public static inline function menuJson(key:String):String
+		return getPath('assets/menus/data/$key.json');
+
+	public static inline function menuMusic(key:String):String
+		return getPath('assets/menus/music/$key.ogg');
+
+	public static inline function menuSparrow(key:String):FlxAtlasFrames
+		return getSparrow(menuImage(key), menuXml(key));
 }

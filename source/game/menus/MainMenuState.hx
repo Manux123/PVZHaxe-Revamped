@@ -7,7 +7,6 @@ import flixel.FlxSprite;
 import flixel.State;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
-
 #if windows
 import core.api.DiscordRPC;
 #end
@@ -23,10 +22,10 @@ class MainMenuState extends State
 
 	// Select Menu Buttons \\
 	/* ==Menu Button Pathss==
-		Adventure Start: 'assets/images/menu/mainmenu/SelectorScreen_StartAdventure_Button1.png'
-		Adventure Start Shadow: 'assets/images/menu/mainmenu/SelectorScreen_Shadow_StartAdventure.png'
-		Adventure: 'assets/images/menu/mainmenu/SelectorScreen_Adventure_Button.png'
-		Adventure Shadow: 'assets/images/menu/mainmenu/SelectorScreen_Shadow_Adventure.png'
+		Adventure Start: 'assets/menus/images/mainmenu/SelectorScreen_StartAdventure_Button1.png'
+		Adventure Start Shadow: 'assets/menus/images/mainmenu/SelectorScreen_Shadow_StartAdventure.png'
+		Adventure: 'assets/menus/images/mainmenu/SelectorScreen_Adventure_Button.png'
+		Adventure Shadow: 'assets/menus/images/mainmenu/SelectorScreen_Shadow_Adventure.png'
 	 */
 	var adventure:FlxButton;
 	var adventure_shadow:FlxSprite;
@@ -51,15 +50,15 @@ class MainMenuState extends State
 	{
 		super.create();
 
-		core.audio.DynamicGameMusic.musicMenu(Paths.music("main_menu_theme"));
+		core.audio.DynamicGameMusic.musicMenu(Paths.menuMusic("main_menu_theme"));
 
-		woodName = new FlxSprite(22, -8).loadGraphic(Paths.image('menu/mainmenu/SelectorScreen_WoodSign1'));
+		woodName = new FlxSprite(22, -8).loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_WoodSign1'));
 		woodUsrSwitch = new FlxButton(25, 126);
-		woodUsrSwitch.loadGraphic(Paths.image('menu/mainmenu/ScreenSelector_WoodSign_Button'), true, 291, 71);
+		woodUsrSwitch.loadGraphic(Paths.menuImage('mainmenu/ScreenSelector_WoodSign_Button'), true, 291, 71);
 		woodUsrName = new FlxText(147, 86);
 		woodUsrName.setFormat(Paths.font('Brianne_s_hand'), 18, 0xFFF5C8, CENTER); // WHY IS THE E DIFFERENTTTTTTTTTTTTTTTTTT
 		woodUsrName.text = GameSave.playerName != null ? GameSave.playerName + '!' : "Unknown!"; // We don't have a name yet
-		woodBroken = new FlxSprite(32, 179).loadGraphic(Paths.image('menu/mainmenu/SelectorScreen_WoodSign3'));
+		woodBroken = new FlxSprite(32, 179).loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_WoodSign3'));
 
 		FlxG.sound.play('assets/sounds/roll_in.ogg');
 		background = new FlxSprite();
@@ -70,18 +69,17 @@ class MainMenuState extends State
 		#end
 
 		// Background Shit \\
-		sky = new FlxSprite().loadGraphic('assets/images/menu/mainmenu/SelectorScreen_BG.jpg');
+		sky = new FlxSprite().loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_BG'));
 		add(background);
 		// Stupid masking because the actual images are jpegs and not pngs >:c \\
 
-		selectMenu = AngelUtils.fromAlphaMask('assets/images/menu/mainmenu/SelectorScreen_BG_Right.jpg',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Right_.png', 71, 41); // VSCode what the fuck is wrong with you
+		selectMenu = AngelUtils.fromAlphaMask(Paths.menuImage('mainmenu/SelectorScreen_BG_Right'), Paths.menuImage('mainmenu/SelectorScreen_BG_Right_'), 71,
+			41); // VSCode what the fuck is wrong with you
 
-		tree = AngelUtils.fromAlphaMask('assets/images/menu/mainmenu/SelectorScreen_BG_Left.jpg', 'assets/images/menu/mainmenu/SelectorScreen_BG_Left_.png',
-			0, -80);
+		tree = AngelUtils.fromAlphaMask(Paths.menuImage('mainmenu/SelectorScreen_BG_Left'), Paths.menuImage('mainmenu/SelectorScreen_BG_Left_'), 0, -80);
 
-		backdrop = AngelUtils.fromAlphaMask('assets/images/menu/mainmenu/SelectorScreen_BG_Center.jpg',
-			'assets/images/menu/mainmenu/SelectorScreen_BG_Center_.png', 103, 250);
+		backdrop = AngelUtils.fromAlphaMask(Paths.menuImage('mainmenu/SelectorScreen_BG_Center'), Paths.menuImage('mainmenu/SelectorScreen_BG_Center_'), 103,
+			250);
 
 		add(sky);
 		add(backdrop);
@@ -182,21 +180,21 @@ class MainMenuState extends State
 		// game data \\
 		if (GameSave.isNewGame)
 		{
-			adventure.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_StartAdventure_Button1.png', true, 331, 146);
-			adventure_shadow = new FlxSprite().loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Shadow_StartAdventure.png');
+			adventure.loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_StartAdventure_Button1'), true, 331, 146);
+			adventure_shadow = new FlxSprite().loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Shadow_StartAdventure'));
 		}
 		else
 		{
-			adventure.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Adventure_button.png', true, 331, 146);
-			adventure_shadow = new FlxSprite().loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Shadow_Adventure.png');
+			adventure.loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Adventure_button'), true, 331, 146);
+			adventure_shadow = new FlxSprite().loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Shadow_Adventure'));
 		}
 		adventure_shadow.x = 399;
 		adventure_shadow.y = 65;
 		trace('[SYSTEM] adventure button');
 		// Mini-Games Button \\
 		minigame = new FlxButton(405, 65, "", openMinigames);
-		minigame.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Survival_button.png', true, 313, 133);
-		minigame_shadow = new FlxSprite().loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Shadow_Survival.png');
+		minigame.loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Survival_button'), true, 313, 133);
+		minigame_shadow = new FlxSprite().loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Shadow_Survival'));
 		minigame.y = 173;
 		minigame.x = 406;
 		minigame_shadow.x = 407;
@@ -207,7 +205,7 @@ class MainMenuState extends State
 
 		// Almanac Button \\
 		almanac = new FlxButton(405, 65, "", openAlmanac);
-		almanac.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Almanac.png', true, 99, 99);
+		almanac.loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Almanac'), true, 99, 99);
 		almanac.y = 433;
 		almanac.x = 306;
 		trace('[SYSTEM] Almanac button');
@@ -221,11 +219,11 @@ class MainMenuState extends State
 		// Pot Buttons \\
 		trace('[SYSTEM] started Pot Button collection...');
 		options = new FlxButton(565, 490, "", optionsShit);
-		options.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Options.png', true, 81, 31);
+		options.loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Options'), true, 81, 31);
 		help = new FlxButton(647, 529, "", helpShit);
-		help.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Help.png', true, 46, 22);
+		help.loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Help'), true, 46, 22);
 		quit = new FlxButton(720, 515, "", quitShit);
-		quit.loadGraphic('assets/images/menu/mainmenu/SelectorScreen_Quit.png', true, 45, 27);
+		quit.loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_Quit'), true, 45, 27);
 		add(options);
 		add(help);
 		add(quit);

@@ -45,8 +45,8 @@ class Zombie extends FlxSprite
 		switch (curZombie)
 		{
 			default:
-				jsonSystem = Json.parse(Assets.getText(Paths.json('zombies/$curZombie')));
-				tex = Paths.getSparrowAtlas('zombies/$curZombie/${jsonSystem.textureName}');
+				jsonSystem = Json.parse(Assets.getText(Paths.gameplayJson('zombies/$curZombie')));
+				tex = Paths.gameplaySparrow('zombies/$curZombie/${jsonSystem.textureName}');
 				frames = tex;
 
 				for (anim in jsonSystem.anims)
