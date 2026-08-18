@@ -249,7 +249,7 @@ class MainMenuState extends State
 		trace("[SYSTEM] Animation not finished!");
 
 		FlxG.sound.music.stop();
-		FlxG.sound.play('assets/sounds/losemusic.ogg');
+		FlxG.sound.play(Paths.sound('gameover/losemusic'));
 
 		var wait:Float = 0;
 

@@ -39,10 +39,10 @@ class PauseSubstate extends flixel.Substate
 		add(optionsMenu);
 		optionsMenu.screenCenter();
 
-        optionsOk.x = optionsBG.x + 29;
+		optionsOk.x = optionsBG.x + 29;
 		optionsOk.y = optionsBG.y + 380;
 
-        backTo.x = optionsBG.x + 100;
+		backTo.x = optionsBG.x + 100;
 		backTo.y = optionsBG.y + 315;
 
 		FlxG.sound.play('assets/sounds/roll_in.ogg');
@@ -59,6 +59,15 @@ class PauseSubstate extends flixel.Substate
 			FlxG.sound.music.resume();
 
 		FlxG.sound.play('assets/sounds/buttonclick.ogg');
+
+		if (!game.LawnState.instance.startFirstWave && game.LawnState.instance.remainingTime > 0)
+		{
+			game.LawnState.instance.startTimer = new flixel.util.FlxTimer().start(game.LawnState.instance.remainingTime, function(tmr:flixel.util.FlxTimer)
+			{
+				game.LawnState.instance.onStart();
+			});
+		}
+
 		close();
 	}
 

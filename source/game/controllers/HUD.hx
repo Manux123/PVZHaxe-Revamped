@@ -27,10 +27,12 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 	public var pauseBitch:Void->Void;
 
-	public function new()
+	public var onStartZombies:Void->Void;
+
+	public function new(levelJson:core.json.LevelData.LevelJson)
 	{
 		super();
-		createHUD();
+		initFromLevel(levelJson);
 	}
 
 	public function initFromLevel(levelJson:core.json.LevelData.LevelJson)
@@ -52,12 +54,14 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 	public function createHUD()
 	{
+		clear();
+
 		seedBank = new FlxSprite(10, 5).loadGraphic(Paths.gameplayImage("ui/SeedBank"));
 		seedBank.scale.set(0.88, 0.88);
 		seedBank.updateHitbox();
 		add(seedBank);
 
-		sunText = new FlxText(seedBank.x + 10, seedBank.y + 50, 40);
+		sunText = new FlxText(seedBank.x + 15, seedBank.y + 51, 40);
 		sunText.color = 0xFF000000;
 		sunText.font = Paths.font("Brianne_s_hand");
 		sunText.text = Std.string(game.LawnConfig.suns);
@@ -89,21 +93,28 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 		}
 
 		houseTxt = new FlxText(FlxG.width * 0.9, FlxG.height * 0.95);
+		houseTxt.text = "Level: " + game.LawnConfig.displayLevel;
+		houseTxt.font = 'assets/fonts/HouseofTerror-Regular.ttf';
+		houseTxt.size = 20;
 		houseTxt.color = 0xFFFCC900;
-		houseTxt.x -= houseTxt.width;
 		houseTxt.borderStyle = OUTLINE;
 		houseTxt.borderSize = 2;
-		houseTxt.font = 'assets/fonts/HouseofTerror-Regular.ttf';
-		houseTxt.text = "Level: " + game.LawnConfig.displayLevel;
 		houseTxt.antialiasing = true;
-		houseTxt.size = 20;
-		houseTxt.active = false;
 		add(houseTxt);
 
 		menuButton = new flixel.ui.FlxButton(681, -12, '', onPausePressed);
 		menuButton.loadGraphic(Paths.gameplayImage('ui/inGamePause'), true, 117, 48);
 		menuButton.updateHitbox();
 		add(menuButton);
+
+		var flagMeter:game.objects.FlagMeter = new game.objects.FlagMeter(FlxG.width * 0.75, FlxG.height * 0.95);
+
+		onStartZombies = function()
+		{
+			add(flagMeter);
+
+			houseTxt.x = flagMeter.x - houseTxt.width - 10;
+		};
 	}
 
 	public function addSun(amount:Int):Void

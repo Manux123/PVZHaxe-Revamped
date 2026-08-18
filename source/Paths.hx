@@ -77,6 +77,9 @@ class Paths
 	public static inline function gameplaySparrow(key:String):FlxAtlasFrames
 		return getSparrow(gameplayImage(key), gameplayXml(key));
 
+	public static inline function gameplaySound(key:String):String
+		return getPath('assets/gameplay/sounds/$key.ogg');
+
 	// menus
 
 	public static inline function menuImage(key:String):String

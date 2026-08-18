@@ -52,6 +52,13 @@ class LawnState extends State
 	var tileOffX:Float = 0;
 	var tileOffY:Float = 0;
 
+	public var modePlay:Bool = false;
+
+	// selection for plants, etc
+	public var modeSelection:Bool = false;
+
+	public var startFirstWave:Bool = false;
+
 	override public function create()
 	{
 		super.create();
@@ -112,7 +119,7 @@ class LawnState extends State
 		plantGrp = new FlxTypedGroup<Plant>();
 		add(plantGrp);
 
-		hud = new HUD();
+		hud = new HUD(levelData.lawnJson);
 		hud.cameras = [camHUD];
 
 		sunGroup = new flixel.group.FlxGroup();
@@ -121,11 +128,97 @@ class LawnState extends State
 		sunController = new SunController(levelData.lawnJson, sunGroup, hud);
 
 		add(hud);
-		hud.initFromLevel(levelData.lawnJson);
-
-		spawnLevelZombies();
 
 		pauseMenu();
+
+		if (!modeSelection)
+			onCountdown();
+	}
+
+	function initializeCameras()
+	{
+		camGame = new flixel.Camera();
+		FlxG.cameras.reset(camGame);
+
+		camHUD = new flixel.FlxCamera();
+		camHUD.bgColor.alpha = 0;
+
+		camHUD.scroll.set(0, 0);
+
+		FlxG.cameras.add(camHUD, false);
+	}
+
+	public var startTimer:flixel.util.FlxTimer;
+	public var remainingTime:Float = 20;
+
+	function onCountdown()
+	{
+		FlxG.sound.play(Paths.gameplaySound('start/readysetplant'));
+
+		modePlay = true;
+
+		var countdownSprite = new FlxSprite();
+		countdownSprite.loadGraphic(Paths.gameplayImage('ui/countdown'), true, 310, 103);
+		countdownSprite.animation.add('ready', [0], 0, false);
+		countdownSprite.animation.add('set', [1], 0, false);
+		countdownSprite.animation.add('plant', [2], 0, false);
+		countdownSprite.screenCenter();
+		countdownSprite.scrollFactor.set();
+		add(countdownSprite);
+
+		var showStep = function(animName:String, delay:Float)
+		{
+			new flixel.util.FlxTimer().start(delay, function(tmr:flixel.util.FlxTimer)
+			{
+				countdownSprite.animation.play(animName);
+				countdownSprite.visible = true;
+
+				countdownSprite.scale.set(1.3, 1.3);
+				countdownSprite.alpha = 1;
+
+				flixel.tweens.FlxTween.tween(countdownSprite.scale, {x: 1, y: 1}, 0.2, {ease: flixel.tweens.FlxEase.backOut});
+
+				if (animName == 'plant')
+				{
+					flixel.tweens.FlxTween.tween(countdownSprite, {alpha: 0}, 0.3, {
+						startDelay: 0.8,
+						onComplete: function(t:flixel.tweens.FlxTween)
+						{
+							countdownSprite.destroy();
+							getMusic();
+
+							remainingTime = 20;
+
+							startTimer = new flixel.util.FlxTimer().start(remainingTime, function(tmr:flixel.util.FlxTimer)
+							{
+								onStart();
+							});
+						}
+					});
+				}
+				else
+				{
+					flixel.tweens.FlxTween.tween(countdownSprite, {alpha: 0}, 0.2, {startDelay: 0.8});
+				}
+			});
+		};
+
+		countdownSprite.visible = false;
+		showStep('ready', 0.0);
+		showStep('set', 0.7);
+		showStep('plant', 1.2);
+	}
+
+	public function onStart()
+	{
+		if (startFirstWave)
+			return;
+
+		startFirstWave = true;
+
+		FlxG.sound.play(Paths.gameplaySound('zombiesarecoming'));
+		hud.onStartZombies();
+		spawnLevelZombies();
 	}
 
 	function spawnLevelZombies():Void
@@ -205,9 +298,15 @@ class LawnState extends State
 			if (FlxG.sound.music != null)
 				FlxG.sound.music.pause();
 
-			sunController?.setPaused(paused);
+			sunController?.setPaused(true);
 
 			FlxG.sound.play(Paths.sound('pause'));
+
+			if (startTimer != null && startTimer.active)
+			{
+				remainingTime = startTimer.timeLeft;
+				startTimer.cancel();
+			}
 
 			persistentUpdate = false;
 			persistentDraw = true;
@@ -252,7 +351,6 @@ class LawnState extends State
 				music.audioGame(5, 'brainiac_maniac');
 			default:
 				DiscordRPC.changePressence('Waiting for User Input...');
-				getMusic();
 		}
 	}
 
@@ -291,7 +389,7 @@ class LawnState extends State
 	{
 		super.update(elapsed);
 
-		if (paused)
+		if (paused || modeSelection)
 			return;
 
 		var plantSelectedIndex:Int = Std.int(Plant.plantIDs.indexOf(selectedPlant));
@@ -323,16 +421,6 @@ class LawnState extends State
 		}
 	}
 
-	function initializeCameras()
-	{
-		camGame = new flixel.Camera();
-		FlxG.cameras.reset(camGame);
-
-		camHUD = new flixel.FlxCamera();
-		camHUD.bgColor.alpha = 0;
-		FlxG.cameras.add(camHUD, false);
-	}
-
 	private function placePlant()
 	{
 		var currentTile = background.tileData[curRow][curCol];
@@ -344,7 +432,10 @@ class LawnState extends State
 			#if debug
 			trace('At Row ${curRow + 1}, Coloumn: ${curCol + 1}');
 			#end
-			FlxG.sound.play(Paths.sound('plant'));
+
+			var plRandom:String = FlxG.random.bool() ? 'plant' : 'plant2';
+			FlxG.sound.play(Paths.gameplaySound('plant/$plRandom'));
+
 			currentTile.appendPlant(plantOverlay.plantableType, () -> plantGrp.add(new Plant(plantOverlay.x, plantOverlay.y)));
 		}
 	}
