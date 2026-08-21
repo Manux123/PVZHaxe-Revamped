@@ -11,8 +11,14 @@ import game.objects.Plant;
 import game.objects.Lawn;
 import game.controllers.HUD;
 import game.objects.Sun;
+import game.objects.Projectile;
 import game.controllers.SunController;
 import core.sprites.AnimationHandler;
+import modding.scripting.ScriptWorld;
+import modding.scripting.hosts.PlantHost;
+import modding.scripting.hosts.ZombieHost;
+import modding.scripting.hosts.LevelHost;
+import modding.scripting.hosts.LawnHost;
 
 class LawnState extends State
 {
@@ -24,10 +30,10 @@ class LawnState extends State
 
 	public static var selectedPlant:String = '';
 
-	public var zombieList:Array<Zombie> = [];
-	public var plantList:Array<Plant> = [];
+	public var zombieGrp:FlxTypedGroup<Zombie>;
 
 	public var plantGrp:FlxTypedGroup<Plant>;
+	public var projectileGrp:FlxTypedGroup<Projectile>;
 
 	public var curRow:Int = 0;
 	public var curCol:Int = 0;
@@ -59,6 +65,27 @@ class LawnState extends State
 
 	public var startFirstWave:Bool = false;
 
+	public var levelScript:Null<modding.scripting.hosts.LevelScript> = null;
+
+	public var isCutscene:Bool = false;
+
+	var _plantHost(get, never):PlantHost;
+	var _zombieHost(get, never):ZombieHost;
+	var _levelHost(get, never):LevelHost;
+	var _lawnHost(get, never):LawnHost;
+
+	inline function get__plantHost()
+		return ScriptWorld.get(PlantHost);
+
+	inline function get__zombieHost()
+		return ScriptWorld.get(ZombieHost);
+
+	inline function get__levelHost()
+		return ScriptWorld.get(LevelHost);
+
+	inline function get__lawnHost()
+		return ScriptWorld.get(LawnHost);
+
 	override public function create()
 	{
 		super.create();
@@ -69,11 +96,14 @@ class LawnState extends State
 		levelData = new LevelData();
 		levelData.loadLevel();
 
+		if (ScriptWorld.ready)
+			_plantHost?.registerScriptedPlants();
+
 		// Load Plant Animations
 		for (plant in Plant.plantIDs)
 			AnimationHandler.parseAnimation('plants', plant);
 
-		background = new Lawn(0, 0, levelData.lawnJson.lawn);
+		background = _lawnHost != null ? _lawnHost.createLawn(0, 0, levelData.lawnJson.lawn) : new Lawn(0, 0, levelData.lawnJson.lawn);
 		camGame.zoom = background.defaultZoom;
 		add(background);
 
@@ -109,11 +139,7 @@ class LawnState extends State
 		tileSpr.active = false;
 		add(tileSpr);
 
-		plantOverlay = new Plant(0, 0);
-		plantOverlay.updateHitbox();
-		plantOverlay.alpha = 0.5;
-		plantOverlay.visible = false;
-		plantOverlay.active = false;
+		plantOverlay = _spawnPlantOverlay(0, 0, 0);
 		add(plantOverlay);
 
 		plantGrp = new FlxTypedGroup<Plant>();
@@ -122,6 +148,24 @@ class LawnState extends State
 		hud = new HUD(levelData.lawnJson);
 		hud.cameras = [camHUD];
 
+		hud.onSeedSelected = function(plantId:String)
+		{
+			selectedPlant = plantId;
+
+			if (plantId != '')
+			{
+				var plantIndex = Plant.plantIDs.indexOf(plantId);
+
+				remove(plantOverlay);
+				plantOverlay = _spawnPlantOverlay(0, 0, plantIndex);
+				add(plantOverlay);
+			}
+			else
+			{
+				plantOverlay.visible = false;
+			}
+		};
+
 		sunGroup = new flixel.group.FlxGroup();
 		add(sunGroup);
 
@@ -129,10 +173,45 @@ class LawnState extends State
 
 		add(hud);
 
+		zombieGrp = new FlxTypedGroup<Zombie>();
+		add(zombieGrp);
+
+		projectileGrp = new FlxTypedGroup<Projectile>();
+		add(projectileGrp);
+
 		pauseMenu();
 
-		if (!modeSelection)
+		if (ScriptWorld.ready)
+		{
+			levelScript = _levelHost?.loadForCurrentLevel();
+			if (levelScript != null)
+				trace('[LawnState] Script level loaded: ${LawnConfig.curLevel}');
+		}
+
+		levelScript?.onCreate();
+
+		if (!modeSelection && !isCutscene)
 			onCountdown();
+	}
+
+	function _spawnPlantOverlay(x:Float, y:Float, plantIndex:Int):Plant
+	{
+		var id = Plant.plantIDs[plantIndex];
+		var p = _plantHost != null ? _plantHost.spawnPlant(id, x, y) : new Plant(x, y, plantIndex);
+		p.updateHitbox();
+		p.alpha = 0.5;
+		p.visible = false;
+		p.active = false;
+		return p;
+	}
+
+	public function makePlantShoot(plant:Plant)
+	{
+		var proj = plant.attack();
+		if (proj != null)
+		{
+			projectileGrp.add(proj);
+		}
 	}
 
 	function initializeCameras()
@@ -153,6 +232,8 @@ class LawnState extends State
 
 	function onCountdown()
 	{
+		levelScript?.onCountdown();
+
 		FlxG.sound.play(Paths.gameplaySound('start/readysetplant'));
 
 		modePlay = true;
@@ -189,6 +270,8 @@ class LawnState extends State
 
 							remainingTime = 20;
 
+							levelScript?.onPlantingPhase();
+
 							startTimer = new flixel.util.FlxTimer().start(remainingTime, function(tmr:flixel.util.FlxTimer)
 							{
 								onStart();
@@ -207,6 +290,8 @@ class LawnState extends State
 		showStep('ready', 0.0);
 		showStep('set', 0.7);
 		showStep('plant', 1.2);
+
+		levelScript?.postCountdown();
 	}
 
 	public function onStart()
@@ -219,6 +304,25 @@ class LawnState extends State
 		FlxG.sound.play(Paths.gameplaySound('zombiesarecoming'));
 		hud.onStartZombies();
 		spawnLevelZombies();
+
+		levelScript?.onStart();
+	}
+
+	public function onWin():Void
+	{
+		levelScript?.onWin();
+		trace('[LawnState] Win!');
+	}
+
+	public function onLose():Void
+	{
+		levelScript?.onLose();
+		trace('[LawnState] GameOver.');
+	}
+
+	public function hugeWave():Void
+	{
+		levelScript?.hugeWave();
 	}
 
 	function spawnLevelZombies():Void
@@ -239,24 +343,17 @@ class LawnState extends State
 			for (i in 0...count)
 			{
 				var spawnRow = row != null ? row : Std.int(Math.random() * background.rows);
-				var spawnY = spawnRow * background.tileHei + 45 + tileOffY;
+				var spawnY = spawnRow * background.tileHei + 37 + tileOffY;
 
 				var createZombie = function()
 				{
-					var z = new Zombie(800, spawnY, type, true);
-					add(z);
-					zombieList.push(z);
-
+					var z = _zombieHost != null ? _zombieHost.spawnZombie(type, 800, spawnY, true) : new Zombie(800, spawnY, type, true);
+					zombieGrp.add(z);
 					sortZombiesByY();
 				};
 
 				if (delay > 0)
-				{
-					new flixel.util.FlxTimer().start(delay, function(tmr:flixel.util.FlxTimer)
-					{
-						createZombie();
-					});
-				}
+					new flixel.util.FlxTimer().start(delay, function(_) createZombie());
 				else
 				{
 					createZombie();
@@ -267,13 +364,7 @@ class LawnState extends State
 
 	function sortZombiesByY():Void
 	{
-		zombieList.sort(function(a, b) return Reflect.compare(a.y, b.y));
-
-		for (z in zombieList)
-		{
-			remove(z, true);
-			add(z);
-		}
+		zombieGrp.sort(flixel.util.FlxSort.byY, flixel.util.FlxSort.ASCENDING);
 	}
 
 	function applyLawnCamera():Void
@@ -298,7 +389,7 @@ class LawnState extends State
 			if (FlxG.sound.music != null)
 				FlxG.sound.music.pause();
 
-			sunController?.setPaused(true);
+			sunController?.setPaused(paused);
 
 			FlxG.sound.play(Paths.sound('pause'));
 
@@ -311,6 +402,8 @@ class LawnState extends State
 			persistentUpdate = false;
 			persistentDraw = true;
 			paused = true;
+
+			levelScript?.onPause();
 
 			openSubState(new game.menus.substate.PauseSubstate());
 		};
@@ -392,6 +485,33 @@ class LawnState extends State
 		if (paused || modeSelection)
 			return;
 
+		levelScript?.onUpdate(elapsed);
+
+		plantGrp.forEachAlive(function(p:Plant)
+		{
+			p.dance();
+			p.shootTimer -= elapsed;
+
+			if (p.shootTimer <= 0)
+			{
+				if (checkForZombiesInRow(p))
+				{
+					makePlantShoot(p);
+
+					p.shootTimer = p._handler.data.shootTimer ?? 1.5;
+				}
+			}
+		});
+
+		FlxG.overlap(projectileGrp, zombieGrp, onZombieHit);
+
+		if (selectedPlant == null || selectedPlant == '')
+		{
+			tileSpr.visible = false;
+			plantOverlay.visible = false;
+			return;
+		}
+
 		var plantSelectedIndex:Int = Std.int(Plant.plantIDs.indexOf(selectedPlant));
 		FlxG.watch.add(plantSelectedIndex, "String", "curPlantSelected");
 
@@ -402,10 +522,11 @@ class LawnState extends State
 
 		var currentTile = background.tileData[curRow][curCol];
 		var isValid = false;
+
 		if (plantOverlay.plantableType == DEFAULT)
-			isValid = !currentTile.hasDEFAULT
+			isValid = !currentTile.hasDEFAULT;
 		else if (plantOverlay.plantableType == TILED)
-			isValid = !currentTile.hasTILED
+			isValid = !currentTile.hasTILED;
 		else if (plantOverlay.plantableType == SECONDARY)
 			isValid = !currentTile.hasSECONDARY;
 
@@ -429,21 +550,80 @@ class LawnState extends State
 
 		if (FlxG.mouse.justPressed && plantOverlay.visible)
 		{
-			#if debug
-			trace('At Row ${curRow + 1}, Coloumn: ${curCol + 1}');
-			#end
+			var plantIndex = Plant.plantIDs.indexOf(selectedPlant);
+			var key = Plant.plantIDs[plantIndex];
+			var cost = AnimationHandler.animations[key]?.data?.cost ?? 100;
 
-			var plRandom:String = FlxG.random.bool() ? 'plant' : 'plant2';
-			FlxG.sound.play(Paths.gameplaySound('plant/$plRandom'));
+			if (hud.spendSun(cost))
+			{
+				#if debug
+				trace('At Row ${curRow + 1}, Coloumn: ${curCol + 1}');
+				#end
 
-			currentTile.appendPlant(plantOverlay.plantableType, () -> plantGrp.add(new Plant(plantOverlay.x, plantOverlay.y)));
+				var plRandom:String = FlxG.random.bool() ? 'plant' : 'plant2';
+				FlxG.sound.play(Paths.gameplaySound('plant/$plRandom'));
+
+				var px = plantOverlay.x;
+				var py = plantOverlay.y;
+
+				currentTile.appendPlant(plantOverlay.plantableType, () ->
+				{
+					var plant = _plantHost != null ? _plantHost.spawnPlant(key, px, py) : new Plant(px, py, Plant.plantIDs.indexOf(key));
+					plantGrp.add(plant);
+
+					levelScript?.onPlantPlaced(plant, curRow, curCol);
+
+					return plant;
+				});
+
+				selectedPlant = '';
+				plantOverlay.visible = false;
+			}
+			else
+			{
+				trace("There are not enough suns.");
+				FlxG.sound.play(Paths.gameplaySound('plant/butter'));
+			}
 		}
+	}
+
+	function onZombieHit(proj:Projectile, zomb:Zombie)
+	{
+		if (!proj.isHit && !zomb.isDying)
+		{
+			proj.onHit();
+			zomb.currentHealth -= proj.damage;
+
+			levelScript?.onProjectileHit(proj, zomb);
+
+			if (zomb.currentHealth <= 0)
+			{
+				levelScript?.onZombieKilled(zomb);
+				zomb.death();
+			}
+		}
+	}
+
+	function checkForZombiesInRow(p:Plant):Bool
+	{
+		var foundTarget:Bool = false;
+
+		zombieGrp.forEachAlive(function(z:Zombie)
+		{
+			if (!z.isDying)
+			{
+				if (Math.abs(z.y - p.y) < 60 && z.x > p.x && z.x < FlxG.width)
+					foundTarget = true;
+			}
+		});
+
+		return foundTarget;
 	}
 
 	override public function destroy()
 	{
-		zombieList = null;
-		plantList = null;
+		levelScript?.onDestroy();
+		levelScript = null;
 
 		sunController?.destroy();
 		sunController = null;

@@ -8,7 +8,7 @@ import flixel.util.FlxColor;
 import game.objects.Plant;
 import flixel.group.FlxSpriteGroup;
 
-typedef AlmanacJsonPlants =
+typedef AlmanacJsonZombies =
 {
 	var namePlant:String; // plant display name
 	var plantReference:String; // what plant will be loading
@@ -20,7 +20,7 @@ typedef AlmanacJsonPlants =
 
 typedef PageEntryPlants =
 {
-	var page:Array<AlmanacJsonPlants>;
+	var page:Array<AlmanacJsonZombies>;
 }
 
 class ZombieEntryPage extends State
@@ -40,10 +40,10 @@ class ZombieEntryPage extends State
 
 	override public function create()
 	{
-		background = new FlxSprite(0, 0).loadGraphic(Paths.menuImage("almanac/Almanac_PlantBack"));
+		background = new FlxSprite(0, 0).loadGraphic(Paths.menuImage("almanac/Almanac_ZombieBack"));
 		add(background);
 
-		titleTxt = new FlxText(305, 15, 356, 'Suburban Almanac - Plants', 36);
+		titleTxt = new FlxText(305, 15, 356, 'Suburban Almanac - Zombies', 36);
 		titleTxt.color = FlxColor.WHITE;
 		titleTxt.borderStyle = OUTLINE;
 		titleTxt.borderSize = 2;
@@ -76,13 +76,13 @@ class ZombieEntryPage extends State
 
 	function exitAlmanac()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('hud/buttonclick')); // button sound
 		FlxG.switchState(new game.menus.MainMenuState());
 	}
 
 	function goToIndex()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('hud/buttonclick')); // button sound
 		FlxG.switchState(new AlmanacState());
 	}
 }
@@ -108,7 +108,7 @@ class AlmanacEntry extends FlxSpriteGroup
 		add(plant);
 
 		overlay = new FlxSprite(x, y);
-		overlay.loadGraphic(Paths.menuImage("almanac/Almanac_PlantCard"));
+		overlay.loadGraphic(Paths.menuImage("almanac/Almanac_ZombieCard"));
 		overlay.alpha = 0.3;
 		add(overlay);
 	}

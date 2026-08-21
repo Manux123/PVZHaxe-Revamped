@@ -102,7 +102,7 @@ class MinigameState extends State
 
 	function exitMinigames()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('hud/buttonclick')); // button sound
 		FlxG.switchState(new game.menus.MainMenuState());
 	}
 

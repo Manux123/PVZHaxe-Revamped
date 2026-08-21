@@ -37,13 +37,11 @@ class OptionsSubstate extends flixel.Substate
 
 		optionsOk.x = optionsBG.x + 29;
 		optionsOk.y = optionsBG.y + 380;
-
-		FlxG.sound.play('assets/sounds/tap.ogg');
 	}
 
 	function closeOptions()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg');
+		FlxG.sound.play(Paths.sound('hud/buttonclick'));
 		close();
 	}
 

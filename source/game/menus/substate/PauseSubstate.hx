@@ -45,7 +45,7 @@ class PauseSubstate extends flixel.Substate
 		backTo.x = optionsBG.x + 100;
 		backTo.y = optionsBG.y + 315;
 
-		FlxG.sound.play('assets/sounds/roll_in.ogg');
+		FlxG.sound.play(Paths.sound('roll_in'));
 
 		optionsOpen = true;
 	}
@@ -58,7 +58,7 @@ class PauseSubstate extends flixel.Substate
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.resume();
 
-		FlxG.sound.play('assets/sounds/buttonclick.ogg');
+		FlxG.sound.play(Paths.sound('hud/buttonclick'));
 
 		if (!game.LawnState.instance.startFirstWave && game.LawnState.instance.remainingTime > 0)
 		{
@@ -78,7 +78,7 @@ class PauseSubstate extends flixel.Substate
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
-		FlxG.sound.play('assets/sounds/buttonclick.ogg');
+		FlxG.sound.play(Paths.sound('hud/buttonclick'));
 		close();
 		FlxG.switchState(new game.menus.MainMenuState());
 	}

@@ -7,7 +7,21 @@ import flixel.text.FlxText;
 
 class SeedPacket extends FlxSpriteGroup
 {
-	public var notRecommended:Bool = false;
+	public var cost:Int;
+	public var setRecommended(get, set):Bool;
+
+	var _setRecommended:Bool = true;
+
+	function get_setRecommended():Bool
+		return _setRecommended;
+
+	function set_setRecommended(value:Bool):Bool
+	{
+		_setRecommended = value;
+		spritePacket.color = value ? FlxColor.WHITE : FlxColor.GRAY;
+		return value;
+	}
+
 	var priceTxt:FlxText;
 	var characterString:String = 'chamoy';
 	var spritePacket:FlxSprite;
@@ -16,7 +30,7 @@ class SeedPacket extends FlxSpriteGroup
 	{
 		super(x, y);
 
-		this.notRecommended = notRecommended;
+		cost = priceValue;
 		characterString = character;
 
 		spritePacket = new FlxSprite(x, y);
@@ -25,20 +39,36 @@ class SeedPacket extends FlxSpriteGroup
 		add(spritePacket);
 		if (notRecommended)
 			spritePacket.color = FlxColor.GRAY;
-		priceTxt = new FlxText(x + 15, y + 110, 100, '$priceValue');
+		priceTxt = new FlxText(x + 20, y + 110, 100, '$priceValue');
 		priceTxt.color = FlxColor.BLACK;
 		priceTxt.size = 20;
 		priceTxt.antialiasing = true;
 		priceTxt.text = Std.string(priceValue);
 		priceTxt.font = 'assets/fonts/vcr.ttf';
 		add(priceTxt);
+
+		setRecommended = !notRecommended;
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (FlxG.mouse.justPressed && FlxG.mouse.overlaps(this))
-			game.LawnState.selectedPlant = characterString;
+		if (FlxG.mouse.justPressed && FlxG.mouse.overlaps(this) && _setRecommended)
+		{
+			if (_setRecommended)
+				game.LawnState.selectedPlant = characterString;
+			else
+			{
+				FlxG.sound.play(Paths.gameplaySound('plant/butter'));
+				flashCostRed();
+			}
+		}
 
 		super.update(elapsed);
+	}
+
+	public function flashCostRed():Void
+	{
+		priceTxt.color = FlxColor.RED;
+		flixel.tweens.FlxTween.color(priceTxt, 0.6, FlxColor.RED, FlxColor.BLACK);
 	}
 }

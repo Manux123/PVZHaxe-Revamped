@@ -6,34 +6,72 @@
   "flipY": false,
   "anims": [
     {
-      "x": 0,
-      "y": 0,
+      "offsets": [
+        0,
+        0
+      ],
       "postfix": "idle zombie1",
       "prefix": "idle",
       "fps": 12,
       "looped": false
     },
     {
-      "x": 0,
-      "y": 0,
+      "offsets": [
+        0,
+        0
+      ],
       "postfix": "idle zombie2",
       "prefix": "idle-alt",
       "fps": 12,
       "looped": false
     },
     {
-      "x": 0,
-      "y": 0,
+      "offsets": [
+        0,
+        0
+      ],
       "postfix": "walk zombie1",
       "prefix": "walk",
       "fps": 12,
       "looped": false
     },
     {
-      "x": 0,
-      "y": 0,
+      "offsets": [
+        0,
+        0
+      ],
       "postfix": "walk zombie2",
       "prefix": "walk-alt",
+      "fps": 12,
+      "looped": false
+    },
+    {
+      "offsets": [
+        -17,
+        -26
+      ],
+      "postfix": "dead zombie1",
+      "prefix": "death1",
+      "fps": 12,
+      "looped": false
+    },
+    {
+      "offsets": [
+        -41,
+        -27
+      ],
+      "postfix": "dead zombie2",
+      "prefix": "death2",
+      "fps": 12,
+      "looped": false
+    },
+    {
+      "offsets": [
+        -48,
+        11
+      ],
+      "postfix": "dead zombie3",
+      "prefix": "death3",
       "fps": 12,
       "looped": false
     }

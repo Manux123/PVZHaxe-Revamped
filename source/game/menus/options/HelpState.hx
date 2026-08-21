@@ -35,7 +35,7 @@ class HelpState extends State
 		text = new FlxSprite(130.5, 131.5).loadGraphic(Paths.menuImage('notes/text/ZombieNoteHelp'));
 		fade = new FlxSprite().loadGraphic(Paths.menuImage('notes/text/ZombieNoteHelpBlack'));
 
-		FlxG.sound.play('assets/sounds/paper.ogg');
+		FlxG.sound.play(Paths.sound('paper'));
 
 		add(bg);
 		add(paper);
@@ -60,7 +60,7 @@ class HelpState extends State
 	function goBack()
 	{
 		trace("go back! I want to be MONKE!"); // I wrote this at school, end me
-		FlxG.sound.play('assets/sounds/tap.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('tap')); // button sound
 		new FlxTimer().start(0.2, (tmr:FlxTimer) ->
 		{
 			FlxG.switchState(new game.menus.MainMenuState());

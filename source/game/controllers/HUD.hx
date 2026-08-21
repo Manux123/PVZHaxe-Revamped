@@ -17,6 +17,8 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 	public var seedPacketList:Array<String> = ['peashooter', 'peashooter'];
 
+	var seedPackets:Array<SeedPacket> = [];
+
 	public var houseTxt:FlxText;
 
 	public var sunText:FlxText;
@@ -25,9 +27,10 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 
 	var spaces:Array<Int> = [45, 40, 35, 30]; // 6,7,8,9 slots
 
+	// callbacks
 	public var pauseBitch:Void->Void;
-
 	public var onStartZombies:Void->Void;
+	public var onSeedSelected:String->Void;
 
 	public function new(levelJson:core.json.LevelData.LevelJson)
 	{
@@ -57,17 +60,19 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 		clear();
 
 		seedBank = new FlxSprite(10, 5).loadGraphic(Paths.gameplayImage("ui/SeedBank"));
-		seedBank.scale.set(0.88, 0.88);
+		seedBank.scale.set(0.248, 0.248);
 		seedBank.updateHitbox();
+		seedBank.scrollFactor.set(0, 0);
 		add(seedBank);
 
-		sunText = new FlxText(seedBank.x + 15, seedBank.y + 51, 40);
+		sunText = new FlxText(seedBank.x + 15, seedBank.y + 52, 40);
 		sunText.color = 0xFF000000;
 		sunText.font = Paths.font("Brianne_s_hand");
 		sunText.text = Std.string(game.LawnConfig.suns);
 		sunText.antialiasing = true;
 		sunText.size = 16;
 		sunText.alignment = FlxTextAlign.CENTER;
+		sunText.scrollFactor.set(0, 0);
 		add(sunText);
 
 		var slotCount = seedPacketList.length;
@@ -86,10 +91,12 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 			var plantData = core.sprites.AnimationHandler.animations[id];
 			var cost:Int = (plantData != null && plantData.data.cost != null) ? plantData.data.cost : 100;
 
-			var seedPacket = new SeedPacket(packetX, packetY, id, cost);
+			var seedPacket = new SeedPacket(packetX, packetY, id, cost, false);
 			seedPacket.scale.set(0.46, 0.46);
 			seedPacket.updateHitbox();
+			seedPacket.scrollFactor.set(0, 0);
 			add(seedPacket);
+			seedPackets.push(seedPacket);
 		}
 
 		houseTxt = new FlxText(FlxG.width * 0.9, FlxG.height * 0.95);
@@ -100,20 +107,23 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 		houseTxt.borderStyle = OUTLINE;
 		houseTxt.borderSize = 2;
 		houseTxt.antialiasing = true;
+		houseTxt.scrollFactor.set(0, 0);
 		add(houseTxt);
 
 		menuButton = new flixel.ui.FlxButton(681, -12, '', onPausePressed);
 		menuButton.loadGraphic(Paths.gameplayImage('ui/inGamePause'), true, 117, 48);
-		menuButton.updateHitbox();
+		menuButton.scrollFactor.set(0, 0);
 		add(menuButton);
 
 		var flagMeter:game.objects.FlagMeter = new game.objects.FlagMeter(FlxG.width * 0.75, FlxG.height * 0.95);
+		flagMeter.scrollFactor.set(0, 0);
 
 		onStartZombies = function()
 		{
 			add(flagMeter);
 
-			houseTxt.x = flagMeter.x - houseTxt.width - 10;
+			flagMeter.cameras = this.cameras;
+            houseTxt.x = flagMeter.x - houseTxt.width - 10;
 		};
 	}
 
@@ -123,6 +133,8 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 		if (game.LawnConfig.suns < 0)
 			game.LawnConfig.suns = 0;
 		sunText.text = Std.string(game.LawnConfig.suns);
+
+		updateSeedPackets();
 	}
 
 	public function canAfford(cost:Int):Bool
@@ -136,10 +148,24 @@ class HUD extends flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>
 		return true;
 	}
 
+	public function updateSeedPackets():Void
+	{
+		for (packet in seedPackets)
+		{
+			packet.setRecommended = canAfford(packet.cost);
+		}
+	}
+
 	function onPausePressed()
 	{
 		if (pauseBitch != null)
 			pauseBitch();
+	}
+
+	override public function update(elapsed:Float):Void
+	{
+		super.update(elapsed);
+		updateSeedPackets();
 	}
 
 	override public function destroy()

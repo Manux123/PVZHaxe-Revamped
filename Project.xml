@@ -50,7 +50,7 @@
 	<haxelib name="flxAnimate" />
 	<haxelib name="hxvlc" unless="android" />
 	<haxelib name="sl-windows-api" if="windows"/>
-
+	<haxelib name="hxscript" />
 
 	<!--In case you want to use nape with flixel-->
 	<!--<haxelib name="nape-haxe4" />-->
@@ -88,6 +88,8 @@
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
 
 	<haxedef name="no-deprecation-warnings"  />
+
+	<haxeflag name="--macro" value="include('modding.scripting.hosts')" />
 	
 	<!-- _________________________________ Custom _______________________________ -->
 

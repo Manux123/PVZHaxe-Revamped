@@ -12,10 +12,10 @@ class SunController
 	public static inline var LAWN_X_MIN:Float = 80.0;
 	public static inline var LAWN_X_MAX:Float = 720.0;
 
-	public static inline var SPAWN_Y:Float = -40.0;
+	public static inline var SPAWN_Y:Float = -80.0;
 
-	public static inline var TARGET_Y_MIN:Float = 60.0;
-	public static inline var TARGET_Y_MAX:Float = 380.0;
+	public static inline var TARGET_Y_MIN:Float = 100.0;
+	public static inline var TARGET_Y_MAX:Float = 680.0;
 
 	static inline var DEFAULT_DROP_RATE:Float = 7.0;
 	static inline var DEFAULT_SUN_AMOUNT:Int = 25;
@@ -64,6 +64,9 @@ class SunController
 
 	function spawnSun()
 	{
+		if (paused)
+			return;
+
 		var spawnX = LAWN_X_MIN + FlxG.random.float() * (LAWN_X_MAX - LAWN_X_MIN);
 		var targetY = TARGET_Y_MIN + FlxG.random.float() * (TARGET_Y_MAX - TARGET_Y_MIN);
 

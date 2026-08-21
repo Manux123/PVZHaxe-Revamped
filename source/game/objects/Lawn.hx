@@ -17,6 +17,7 @@ typedef LawnData =
 	var ?camPos:Array<Float>;
 }
 
+@:scriptable
 class Lawn extends FlxSpriteGroup
 {
 	public var lawnJson:LawnData;
@@ -35,7 +36,7 @@ class Lawn extends FlxSpriteGroup
 	public var tileHei:Float = 100;
 	public var tileData:Array<Array<Tile>> = [];
 
-	public function new(x:Float = 0, y:Float = 0, backgroundType:String = "grassday", ?row:Int = 9, ?column:Int = 5)
+	public function new(x:Float = 0, y:Float = 0, backgroundType:String = "grassday")
 	{
 		super(x, y);
 
@@ -54,7 +55,7 @@ class Lawn extends FlxSpriteGroup
 		this.columns = lawnJson.cols;
 		this.type = backgroundType;
 
-		tileData = [for (i in 0...rows) [for (j in 0...column) new Tile()]];
+		tileData = [for (i in 0...rows) [for (j in 0...columns) new Tile()]];
 		lawnSprite = new FlxSprite();
 		lawnSprite.loadGraphic(Paths.gameplayImage('levels/${lawnJson.path}'));
 		lawnSprite.active = false;

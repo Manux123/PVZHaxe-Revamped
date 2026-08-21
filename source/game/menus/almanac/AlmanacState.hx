@@ -48,13 +48,13 @@ class AlmanacState extends State
 
 	function exitAlmanac()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('hud/buttonclick')); // button sound
 		FlxG.switchState(new game.menus.MainMenuState());
 	}
 
 	function enterPlant()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('hud/buttonclick')); // button sound
 		FlxG.switchState(new PlantEntryPage());
 	}
 }

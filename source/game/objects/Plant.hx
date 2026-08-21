@@ -3,17 +3,28 @@ package game.objects;
 import core.sprites.AnimationHandler;
 import flixel.FlxSprite;
 
+@:scriptable
 class Plant extends flixel.FlxSprite
 {
-	static public final plantIDs:Array<String> = ['peashooter'];
+	static public var plantIDs:Array<String> = ['peashooter'];
+
+	public static function registerID(id:String):Void
+	{
+		if (!plantIDs.contains(id))
+			plantIDs.push(id);
+	}
 
 	public var _handler:Animation;
+
+	public var currentHealth:Int = 4;
 
 	public var plantID:Int;
 	public var plantableType:PlantableType;
 	public var plantType:PlantType;
 	public var isAsleep:Bool;
-	public var isShooting:Bool;
+	public var isShooting:Bool = false;
+
+	public var shootTimer:Float = 0;
 
 	public var cost(get, never):Int;
 
@@ -21,6 +32,11 @@ class Plant extends flixel.FlxSprite
 		return _handler.data.cost ?? 100;
 
 	var shadow:FlxSprite;
+
+	public var plantHealth(get, never):Int; // bites it can withstand
+
+	inline function get_plantHealth():Int
+		return _handler.data.health ?? 4;
 
 	public function new(x:Float = 0, y:Float = 0, plantID:Int = 0, plantableType:PlantableType = DEFAULT, plantType:PlantType = ALL)
 	{
@@ -32,11 +48,13 @@ class Plant extends flixel.FlxSprite
 		_handler = AnimationHandler.animations[key];
 		frames = _handler.sprite.frames;
 		animation.copyFrom(_handler.sprite.animation);
-		animation.play("idle");
+		playAnim('idle');
 		updateHitbox();
 
+		currentHealth = plantHealth;
+
 		shadow = new FlxSprite(0, 0);
-		shadow.loadGraphic(Paths.gameplayImage('plants/plantshadow'));
+		shadow.loadGraphic(Paths.gameplayImage('shadowPZ'));
 	}
 
 	override function draw()
@@ -61,9 +79,40 @@ class Plant extends flixel.FlxSprite
 		super.destroy();
 	}
 
-	public function attack(projectile:String):Void {}
+	public function attack():Projectile
+	{
+		if (isAsleep || _handler.data.projectile == null)
+			return null;
 
-	public function damage(points:Int):Void {}
+		isShooting = true;
+
+		var spawnX = x + width - 10;
+		var spawnY = y + 10;
+
+		var proj = new Projectile(spawnX, spawnY, _handler.data.projectile);
+
+		playAnim("shoot", true);
+
+		if (animation.curAnim.finished && animation.curAnim.name == "shoot")
+			isShooting = false;
+
+		return proj;
+	}
+
+	public function dance() {
+		if (isShooting)
+        {
+            if (animation.curAnim != null && animation.curAnim.name == "shoot" && animation.curAnim.finished)
+            {
+                isShooting = false;
+                playAnim('idle');
+            }
+            return;
+        }
+
+		if (animation.curAnim != null && animation.curAnim.finished && animation.curAnim.name == "idle")
+			playAnim('idle');
+	}
 
 	public function sleep():Void {};
 

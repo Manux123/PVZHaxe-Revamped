@@ -60,7 +60,7 @@ class MainMenuState extends State
 		woodUsrName.text = GameSave.playerName != null ? GameSave.playerName + '!' : "Unknown!"; // We don't have a name yet
 		woodBroken = new FlxSprite(32, 179).loadGraphic(Paths.menuImage('mainmenu/SelectorScreen_WoodSign3'));
 
-		FlxG.sound.play('assets/sounds/roll_in.ogg');
+		FlxG.sound.play(Paths.sound('roll_in'));
 		background = new FlxSprite();
 		background.makeGraphic(800, 600, FlxColor.WHITE);
 
@@ -233,7 +233,7 @@ class MainMenuState extends State
 	function openAdventure()
 	{
 		acceptOption = true;
-		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('gravebutton')); // button sound
 		fuckYouStop();
 
 		if (GameSave.isNewGame)
@@ -249,7 +249,7 @@ class MainMenuState extends State
 		trace("[SYSTEM] Animation not finished!");
 
 		FlxG.sound.music.stop();
-		FlxG.sound.play(Paths.sound('gameover/losemusic'));
+		FlxG.sound.play(Paths.gameplaySound('gameover/losemusic'));
 
 		var wait:Float = 0;
 
@@ -257,7 +257,7 @@ class MainMenuState extends State
 		{
 			new FlxTimer().start(1.5, (tmr:FlxTimer) ->
 			{
-				FlxG.sound.play('assets/sounds/evillaugh.ogg');
+				FlxG.sound.play(Paths.sound('evillaugh'));
 			});
 			wait = 6.5;
 		}
@@ -273,7 +273,7 @@ class MainMenuState extends State
 		if (acceptOption)
 			return;
 
-		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('gravebutton')); // button sound
 		if (GameSave.minigamesUnlocked)
 		{
 			trace("[SYSTEM] MiniGame Unlocked");
@@ -290,7 +290,7 @@ class MainMenuState extends State
 	{
 		if (acceptOption)
 			return;
-		FlxG.sound.play('assets/sounds/gravebutton.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('gravebutton')); // button sound
 		FlxG.switchState(new game.menus.almanac.AlmanacState());
 	}
 
@@ -307,7 +307,7 @@ class MainMenuState extends State
 	{
 		if (acceptOption)
 			return;
-		FlxG.sound.play('assets/sounds/tap.ogg');
+		FlxG.sound.play(Paths.sound('tap'));
 		fuckYouStop();
 		persistentUpdate = false;
 		persistentDraw = true;
@@ -318,7 +318,7 @@ class MainMenuState extends State
 	{
 		if (acceptOption)
 			return;
-		FlxG.sound.play('assets/sounds/tap.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('tap')); // button sound
 		FlxG.sound.music.stop();
 		new FlxTimer().start(0.2, (tmr:FlxTimer) ->
 		{
@@ -330,7 +330,7 @@ class MainMenuState extends State
 	{
 		if (acceptOption)
 			return;
-		FlxG.sound.play('assets/sounds/tap.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('tap')); // button sound
 		// !!IMPORTANT: GET A MENU BEFORE CLOSING!! \\
 		lime.system.System.exit(0);
 	}

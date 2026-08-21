@@ -25,7 +25,7 @@ class FlagMeter extends FlxSpriteGroup
 
 		levelText = new FlxSprite(0, 0, Paths.gameplayImage("ui/levelBar/FlagMeterLevelProgress"));
 		levelText.x = progressBar.x;
-		levelText.y = progressBar.y + progressBar.height + 2;
+		levelText.y = progressBar.y + 2;
 		add(levelText);
 
 		flags = new FlxSpriteGroup();

@@ -11,6 +11,13 @@
             "version": "4.0.1"
         },
         {
+            "name": "hxcpp",
+            "type": "git",
+            "dir": null,
+            "ref": "patched-hxscript",
+            "url": "https://github.com/MeguminBOT/hxcpp"
+        },
+        {
             "name": "flxanimate",
             "type": "git",
             "dir": null,
@@ -51,6 +58,13 @@
             "dir": null,
             "ref": "main",
             "url": "https://github.com/Slushi-Github/SL-Windows-API"
+        },
+        {
+            "name": "hxscript",
+            "type": "git",
+            "dir": null,
+            "ref": "main",
+            "url": "https://github.com/MeguminBOT/hxscript"
         }
     ]
 }

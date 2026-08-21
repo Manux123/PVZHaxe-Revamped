@@ -4,7 +4,7 @@ import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.geom.Point;
 import flixel.animation.FlxAnimationController;
-import openfl.utils.Assets;
+import core.sprites.AnimationData;
 import haxe.Json;
 
 /**
@@ -24,12 +24,12 @@ class AnimationHandler
 		if (animations.exists(key))
 			return;
 
-		var datas:PlantJson = Json.parse(Assets.getText(Paths.gameplayJson('$path/$key')));
+		var datas:PlantJson = Json.parse(openfl.utils.Assets.getText(Paths.gameplayJson('$path/$key')));
 		animations[key] = new Animation(Paths.gameplaySparrow('plants/${datas.textureName}'), datas);
 		for (anim in datas.anims)
 		{
 			animations[key].sprite.animation.addByPrefix(anim.prefix, anim.postfix, anim.fps, anim.looped);
-			animations[key].offsets[anim.prefix] = new Point(anim.x, anim.y);
+			animations[key].offsets[anim.prefix] = new Point(anim.offsets[0], anim.offsets[1]);
 		}
 
 		var g = animations[key].sprite.graphic;
@@ -59,19 +59,12 @@ class Animation
 typedef PlantJson =
 {
 	var textureName:String;
+	var ?timer:Float;
 	var ?anims:Array<AnimationData>;
 	var ?flipX:Bool;
 	var ?flipY:Bool;
 	var ?projectile:String;
 	var ?cost:Int;
-}
-
-typedef AnimationData =
-{
-	var ?x:Float;
-	var ?y:Float;
-	var ?prefix:String;
-	var ?postfix:String;
-	var ?fps:Int;
-	var ?looped:Bool;
+	var ?shootTimer:Float;
+	var ?health:Int;
 }

@@ -76,13 +76,13 @@ class PlantEntryPage extends State
 
 	function exitAlmanac()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('hud/buttonclick')); // button sound
 		FlxG.switchState(new game.menus.MainMenuState());
 	}
 
 	function goToIndex()
 	{
-		FlxG.sound.play('assets/sounds/buttonclick.ogg'); // button sound
+		FlxG.sound.play(Paths.sound('hud/buttonclick')); // button sound
 		FlxG.switchState(new AlmanacState());
 	}
 }

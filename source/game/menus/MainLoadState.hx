@@ -15,6 +15,9 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import game.objects.Plant;
 import core.sprites.AnimationHandler;
+import modding.scripting.ScriptWorld;
+import modding.scripting.ScriptReloadPlugin;
+import modding.scripting.hosts.*;
 
 class MainLoadState extends State
 {
@@ -181,6 +184,19 @@ class MainLoadState extends State
 	{
 		loadQueue = [];
 
+		FlxG.plugins.addPlugin(new ScriptReloadPlugin());
+
+		ScriptWorld.addHost(new PatchHost());
+		ScriptWorld.addHost(new PlantHost());
+		ScriptWorld.addHost(new ZombieHost());
+		ScriptWorld.addHost(new ProjectileHost());
+		ScriptWorld.addHost(new StateHost());
+		ScriptWorld.addHost(new LevelHost());
+		ScriptWorld.addHost(new LawnHost());
+		ScriptWorld.init("assets/scripts");
+
+		ScriptWorld.get(PlantHost)?.registerScriptedPlants();
+
 		for (plant in Plant.plantIDs)
 		{
 			var id = plant;
@@ -231,12 +247,11 @@ class MainLoadState extends State
 			});
 		}
 
-		// Main Menu: sonidos
 		var menuSounds = [
-			'assets/sounds/buttonclick.ogg',
+			'assets/sounds/hud/buttonclick.ogg',
 			'assets/sounds/evillaugh.ogg',
 			'assets/sounds/gravebutton.ogg',
-			'assets/sounds/losemusic.ogg',
+			'assets/gameplay/sounds/losemusic.ogg',
 			'assets/sounds/roll_in.ogg',
 			'assets/sounds/tap.ogg',
 		];

@@ -1,5 +1,9 @@
 {
     "path": "pea",
-    "speed": 100,
-    "health": -10
+    "speed": 400,
+    "damage": 20,
+    "hitbox": [
+        0.2,
+        0.2
+    ]
 }
